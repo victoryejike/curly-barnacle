@@ -30,7 +30,7 @@ const formSchema = z.object({
   protein: z.string(),
   drinks: z.string(),
   additionalItems: z.string(),
-  waitTime: z.number({ required_error: "Estimated time is required" }),
+  waitTime: z.string({ required_error: "Estimated time is required" }),
 });
 
 const OrderForm = () => {
@@ -45,7 +45,7 @@ const OrderForm = () => {
       protein: "",
       drinks: "",
       additionalItems: "",
-      waitTime: 0,
+      waitTime: "",
     },
   });
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -99,8 +99,11 @@ const OrderForm = () => {
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Breakfast</FormLabel>
                   <FormControl>
-                    <Select>
-                      <SelectTrigger className="" {...field}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="">
                         <SelectValue placeholder="Theme" />
                       </SelectTrigger>
                       <SelectContent>
@@ -124,8 +127,11 @@ const OrderForm = () => {
                 <FormItem className="w-1/2 ml-3">
                   <FormLabel>Main menu</FormLabel>
                   <FormControl>
-                    <Select>
-                      <SelectTrigger className="" {...field}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="">
                         <SelectValue placeholder="Select Main menu" />
                       </SelectTrigger>
                       <SelectContent>
@@ -151,8 +157,11 @@ const OrderForm = () => {
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Protein</FormLabel>
                   <FormControl>
-                    <Select>
-                      <SelectTrigger className="" {...field}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="">
                         <SelectValue placeholder="Select Protein" />
                       </SelectTrigger>
                       <SelectContent>
@@ -176,8 +185,11 @@ const OrderForm = () => {
                 <FormItem className="w-1/2 ml-3">
                   <FormLabel>Drinks</FormLabel>
                   <FormControl>
-                    <Select>
-                      <SelectTrigger className="" {...field}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="">
                         <SelectValue placeholder="Select Drinks" />
                       </SelectTrigger>
                       <SelectContent>
@@ -203,8 +215,11 @@ const OrderForm = () => {
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Additonal Items</FormLabel>
                   <FormControl>
-                    <Select>
-                      <SelectTrigger className="" {...field}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="">
                         <SelectValue placeholder="Select additional items" />
                       </SelectTrigger>
                       <SelectContent>
