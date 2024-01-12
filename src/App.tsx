@@ -1,5 +1,5 @@
-import Backoffice from "./pages/backoffice";
-import Frontoffice from "./pages/frontoffice";
+import Backoffice from "./pages/Backoffice";
+import Frontoffice from "./pages/Frontoffice";
 import Header from "./components/Header";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
