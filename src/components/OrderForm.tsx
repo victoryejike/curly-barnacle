@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 
@@ -33,54 +34,110 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
-  customerName: z.string({ required_error: "Customer name is required" }),
-  phone: z.string({ required_error: "Customer phone number is required" }),
-  breakfast: z.string(),
-  mainMenu: z.string(),
-  protein: z.string(),
-  drinks: z.string(),
-  additionalItems: z.string(),
+  customerName: z.string().min(1, "Required"),
+  phone: z.string().min(1, "Required"),
+  breakfast: z.object({ item: z.string(), price: z.number() }),
+  mainMenu: z.object({ item: z.string(), price: z.number() }),
+  protein: z.object({ item: z.string(), price: z.number() }),
+  drinks: z.object({ item: z.string(), price: z.number() }),
+  additionalItems: z.object({ item: z.string(), price: z.number() }),
   waitTime: z.coerce.number().gte(1, "Must be greater than 0"),
+  total: z.coerce.number(),
 });
 
 const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
+  { label: "English", value: "en", price: 1200 },
+  { label: "French", value: "fr", price: 1200 },
+  { label: "German", value: "de", price: 1200 },
+  { label: "Spanish", value: "es", price: 1200 },
+  { label: "Portuguese", value: "pt", price: 1200 },
+  { label: "Russian", value: "ru", price: 1200 },
+  { label: "Japanese", value: "ja", price: 1200 },
+  { label: "Korean", value: "ko", price: 1200 },
+  { label: "Chinese", value: "zh", price: 1200 },
 ] as const;
 
 const OrderForm = () => {
   const snap = useSnapshot(state);
+  const [subtotal, setSubtotal] = useState(0);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customerName: undefined,
-      phone: undefined,
-      breakfast: undefined,
-      mainMenu: undefined,
-      protein: undefined,
-      drinks: undefined,
-      additionalItems: undefined,
-      waitTime: undefined,
+      customerName: "",
+      phone: "",
+      breakfast: {
+        item: "",
+        price: 0,
+      },
+      mainMenu: {
+        item: "",
+        price: 0,
+      },
+      protein: {
+        item: "",
+        price: 0,
+      },
+      drinks: {
+        item: "",
+        price: 0,
+      },
+      additionalItems: {
+        item: "",
+        price: 0,
+      },
+      waitTime: 0,
+      total: subtotal,
     },
   });
+
+  useEffect(() => {
+    if (snap.submitted) form.reset();
+    form.watch((values) => {
+      const totalFoodPrice = [
+        values.breakfast?.price,
+        values.mainMenu?.price,
+        values.protein?.price,
+        values.additionalItems?.price,
+        values.drinks?.price,
+      ];
+      if (!totalFoodPrice.includes(undefined)) {
+        const calculatedTotal =
+          values.breakfast!.price! +
+          values.mainMenu!.price! +
+          values.protein!.price! +
+          values.additionalItems!.price! +
+          values.drinks!.price!;
+        setSubtotal(calculatedTotal);
+      }
+    });
+    // form.setValue("total", calculatedTotal);
+    // return subscription.unsubscribe();
+  }, [form, form.watch, snap.submitted]);
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    // form.setValue("total", subtotal);
+    console.log(values, subtotal);
     if (values) {
       state.showPreview = true;
       state.order = values;
       state.summary.map((data, index) => {
         if (index === 1) {
           data.description = values.customerName;
+        }
+
+        if (index === 2) {
+          data.description = values.waitTime + "mins";
+        }
+
+        if (index === 3) {
+          data.description = subtotal;
+        }
+        if (index === 4) {
+          data.description = subtotal;
         }
       });
     }
@@ -124,7 +181,7 @@ const OrderForm = () => {
           <div className="flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="breakfast"
+              name="breakfast.item"
               render={({ field }) => (
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Breakfast</FormLabel>
@@ -140,11 +197,7 @@ const OrderForm = () => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value
-                              )?.label
-                            : "Select breakfast"}
+                          {field.value ? field.value : "Select breakfast"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -159,18 +212,25 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("breakfast", language.value);
+                                form.setValue(`breakfast.item`, language.label);
+                                form.setValue(
+                                  "breakfast.price",
+                                  language.price
+                                );
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  language.value === field.value
+                                  language.label === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                              {language.label}
+                              <div className="flex justify-between items-center w-full">
+                                <p>{language.label}</p>
+                                <p>₦ {language.price}</p>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -184,7 +244,7 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="mainMenu"
+              name="mainMenu.item"
               render={({ field }) => (
                 <FormItem className="w-1/2 ml-3">
                   <FormLabel>Main menu</FormLabel>
@@ -199,11 +259,7 @@ const OrderForm = () => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value
-                              )?.label
-                            : "Select main menu"}
+                          {field.value ? field.value : "Select main menu"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -218,18 +274,22 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("mainMenu", language.value);
+                                form.setValue("mainMenu.item", language.label);
+                                form.setValue("mainMenu.price", language.price);
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  language.value === field.value
+                                  language.label === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                              {language.label}
+                              <div className="flex justify-between items-center w-full">
+                                <p>{language.label}</p>
+                                <p>₦ {language.price}</p>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -245,7 +305,7 @@ const OrderForm = () => {
           <div className="flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="protein"
+              name="protein.item"
               render={({ field }) => (
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Protein</FormLabel>
@@ -260,11 +320,7 @@ const OrderForm = () => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value
-                              )?.label
-                            : "Select protein"}
+                          {field.value ? field.value : "Select protein"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -279,18 +335,22 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("protein", language.value);
+                                form.setValue("protein.item", language.label);
+                                form.setValue("protein.price", language.price);
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  language.value === field.value
+                                  language.label === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                              {language.label}
+                              <div className="flex justify-between items-center w-full">
+                                <p>{language.label}</p>
+                                <p>₦ {language.price}</p>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -304,7 +364,7 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="drinks"
+              name="drinks.item"
               render={({ field }) => (
                 <FormItem className="w-1/2 ml-3">
                   <FormLabel>Drinks</FormLabel>
@@ -319,11 +379,7 @@ const OrderForm = () => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value
-                              )?.label
-                            : "Select drinks"}
+                          {field.value ? field.value : "Select drinks"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -338,18 +394,22 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("drinks", language.value);
+                                form.setValue("drinks.item", language.label);
+                                form.setValue("drinks.price", language.price);
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  language.value === field.value
+                                  language.label === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                              {language.label}
+                              <div className="flex justify-between items-center w-full">
+                                <p>{language.label}</p>
+                                <p>₦ {language.price}</p>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -365,7 +425,7 @@ const OrderForm = () => {
           <div className="flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="additionalItems"
+              name="additionalItems.item"
               render={({ field }) => (
                 <FormItem className="w-1/2 mr-3">
                   <FormLabel>Additonal Items</FormLabel>
@@ -380,11 +440,7 @@ const OrderForm = () => {
                             !field.value && "text-muted-foreground"
                           )}
                         >
-                          {field.value
-                            ? languages.find(
-                                (language) => language.value === field.value
-                              )?.label
-                            : "Select Additonal Items"}
+                          {field.value ? field.value : "Select Additonal Items"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
@@ -400,20 +456,27 @@ const OrderForm = () => {
                               key={language.value}
                               onSelect={() => {
                                 form.setValue(
-                                  "additionalItems",
-                                  language.value
+                                  "additionalItems.item",
+                                  language.label
+                                );
+                                form.setValue(
+                                  "additionalItems.price",
+                                  language.price
                                 );
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  language.value === field.value
+                                  language.label === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
-                              {language.label}
+                              <div className="flex justify-between items-center w-full">
+                                <p>{language.label}</p>
+                                <p>₦ {language.price}</p>
+                              </div>
                             </CommandItem>
                           ))}
                         </CommandGroup>

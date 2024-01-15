@@ -1,6 +1,7 @@
 import Backoffice from "./pages/Backoffice";
 import Frontoffice from "./pages/Frontoffice";
 import Header from "./components/Header";
+import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           </Router>
         </div>
       </div>
+      <Toaster />
     </section>
   );
 }
