@@ -23,6 +23,7 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
   const handleClick = () => {
     state.data.push(state.order);
+    localStorage.setItem("orders", JSON.stringify(snap.data));
     console.log(snap.data);
     state.submitted = true;
     state.showPreview = false;

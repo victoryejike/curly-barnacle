@@ -48,6 +48,32 @@ const formSchema = z.object({
   total: z.coerce.number(),
 });
 
+/* 
+***** proposed update to form schema
+const formSchema = z.object({
+  customerInfo: z.object({
+    customerName: z.string().min(1, "Required"),
+    phone: z.string().min(1, "Required"),
+  }),
+  orderInfo: z.object({
+    breakfast: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
+    mainMenu: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
+    protein: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
+    drinks: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
+    additionalItems: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
+    waitTime: z.coerce.number().gte(1, "Must be greater than 0"),
+  }).partial().refine(({ breakfast, mainMenu, protein, drinks, additionalItems }) => {
+    if (breakfast.item === '' || mainMenu.item === '' || protein.item === '' || drinks.item === '' || additionalItems.item === '') {
+      return false
+    }
+    return true
+  }, {
+    message: "One of the fields must be defined"
+  }) 
+})
+
+*/
+
 const languages = [
   { label: "English", value: "en", price: 1200 },
   { label: "French", value: "fr", price: 1200 },
@@ -64,6 +90,46 @@ const OrderForm = () => {
   const snap = useSnapshot(state);
   const [subtotal, setSubtotal] = useState(0);
   // 1. Define your form.
+
+  /* **** Proposed form 
+    const form = useForm<z.infer<typeof formSchema>>({
+      reesolver: zodResolver(formSchema),
+      defaultValues: {
+        customerInfo: {
+          customerName: "",
+          phone: "",
+        },
+        orderInfo: {
+          breakfast: {
+            item: "",
+            price: 0,
+            quantity: 0
+          },
+          mainMenu: {
+            item: "",
+            price: 0,
+            quantity: 0
+          },
+          protein: {
+            item: "",
+            price: 0,
+            quantity: 0
+          },
+          drinks: {
+            item: "",
+            price: 0,
+            quantity: 0
+          },
+          additionalItems: {
+            item: "",
+            price: 0,
+            quantity: 0
+          },
+          waitTime: 0
+        }
+      }
+    })
+  */
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -93,10 +159,10 @@ const OrderForm = () => {
       total: subtotal,
     },
   });
-
+  const { watch, reset } = form;
   useEffect(() => {
-    if (snap.submitted) form.reset();
-    form.watch((values) => {
+    if (snap.submitted) reset();
+    watch((values) => {
       const totalFoodPrice = [
         values.breakfast?.price,
         values.mainMenu?.price,
@@ -116,14 +182,15 @@ const OrderForm = () => {
     });
     // form.setValue("total", calculatedTotal);
     // return subscription.unsubscribe();
-  }, [form, form.watch, snap.submitted]);
+  }, [reset, watch, snap.submitted, subtotal]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    // form.setValue("total", subtotal);
+    form.setValue("total", subtotal);
     console.log(values, subtotal);
     if (values) {
       state.showPreview = true;
       state.order = values;
+
       state.summary.map((data, index) => {
         if (index === 1) {
           data.description = values.customerName;

@@ -11,12 +11,13 @@ import {
 
 import { useSnapshot } from "valtio";
 import { state } from "@/state";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
 
 const Frontoffice = () => {
   const snap = useSnapshot(state);
+  const [orders, setOrders] = useState([]);
   useEffect(() => {
     console.log(state.data);
   }, [snap.data]);
