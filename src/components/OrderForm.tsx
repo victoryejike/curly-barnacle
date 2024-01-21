@@ -6,6 +6,7 @@ import { Toaster, toast } from "react-hot-toast";
 // State Management
 import { useSnapshot } from "valtio";
 import { state } from "@/state";
+import { customAlphabet } from "nanoid";
 
 // UI IMPORTS
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ import { useNavigate } from "react-router-dom";
 
 // ***** proposed update to form schema
 const formSchema = z.object({
+  id: z.string(),
   customerInfo: z.object({
     customerName: z.string().min(1, "Required"),
     phone: z.string().min(1, "Required"),
@@ -113,12 +115,14 @@ const OrderForm = () => {
   const snap = useSnapshot(state);
   const [subtotal, setSubtotal] = useState(0);
   const navigate = useNavigate();
+  const nanoid = customAlphabet("1234567890abcdef", 10);
   // 1. Define your form.
 
   //  ** Proposed form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      id: `#${nanoid(7)}`,
       customerInfo: {
         customerName: "",
         phone: "",
@@ -194,6 +198,9 @@ const OrderForm = () => {
       state.order = values;
 
       state.summary.map((data, index) => {
+        if (index === 0) {
+          data.description = values.id;
+        }
         if (index === 1) {
           data.description = values.customerInfo.customerName;
         }

@@ -8,19 +8,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CountdownTimer from "@/components/CountdownTimer";
 
-import { useSnapshot } from "valtio";
-import { state } from "@/state";
-import { useEffect } from "react";
+// import { useSnapshot } from "valtio";
+// import { state } from "@/state";
+import { useEffect, useState } from "react";
 import { customAlphabet } from "nanoid";
+import { LucideTrash2 } from "lucide-react";
 const nanoid = customAlphabet("1234567890abcdef", 10);
 
 const Frontoffice = () => {
-  const snap = useSnapshot(state);
-  // const [orders, setOrders] = useState([]);
+  // const snap = useSnapshot(state);
+  const [orders, setOrders] = useState([]);
   useEffect(() => {
-    console.log(state.data);
-  }, [snap.data]);
+    const placedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
+    console.log(placedOrders);
+    setOrders(placedOrders);
+  }, []);
+
+  const handleCountdownFinish = (id: string) => {
+    // Update orderInfo with waitTime set to 0
+    const updatedOrders: any = orders.filter((order: any) => order.id !== id);
+    // const updatedOrders: any = orders.map((order: any) => {
+    //   if (order.id === id) {
+    //     // return {
+    //     //   ...order,
+    //     //   orderInfo: {
+    //     //     ...order.orderInfo,
+    //     //     waitTime: 0,
+    //     //   },
+    //     // };
+    //   }
+    //   return order; // Return the unchanged order for other items
+    // });
+
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    setOrders(updatedOrders);
+  };
   return (
     <div className="pt-4">
       <Table>
@@ -30,20 +54,29 @@ const Frontoffice = () => {
             <TableHead className="w-[100px]">Order ID</TableHead>
             <TableHead>Customer Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Order</TableHead>
-            <TableHead className="text-right">Ready in</TableHead>
-            <TableHead className="text-right"></TableHead>
+            <TableHead className="">Order</TableHead>
+            <TableHead className="">Ready in</TableHead>
+            <TableHead className=""></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {snap.data.map((invoice: any) => (
+          {orders.map((invoice: any) => (
             <TableRow key={nanoid()}>
-              <TableCell className="font-medium">{invoice.phone}</TableCell>
-              <TableCell>{invoice.customerName}</TableCell>
-              <TableCell>{invoice.customerName}</TableCell>
-              <TableCell>{invoice.breakfast?.item}</TableCell>
-              <TableCell>{invoice.customerName}</TableCell>
-              <TableCell className="text-right">{invoice.total}</TableCell>
+              <TableCell className="font-medium">{invoice.id}</TableCell>
+              <TableCell>{invoice.customerInfo.customerName}</TableCell>
+              <TableCell>{invoice.customerInfo.customerName}</TableCell>
+              <TableCell>{invoice.customerInfo.customerName}</TableCell>
+              <TableCell>
+                <CountdownTimer
+                  waitTime={invoice.orderInfo.waitTime}
+                  onCountdownFinish={() => handleCountdownFinish(invoice.id)}
+                  identifier={invoice.id}
+                  key={invoice.id}
+                />
+              </TableCell>
+              <TableCell className="text-right">
+                <LucideTrash2 className="text-red-400 cursor-pointer" />
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -1,12 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { proxy } from "valtio";
-import { customAlphabet } from "nanoid";
-const nanoid = customAlphabet("1234567890abcdef", 10);
 
 export const summaryInitialValues = [
   {
     title: "Order ID.",
-    description: `#${nanoid(7)}`,
+    description: "",
   },
   {
     title: "Customer Name",
