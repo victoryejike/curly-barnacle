@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as z from "zod";
 import { useForm } from "react-hook-form";
+import { Toaster, toast } from "react-hot-toast";
 
 // State Management
 import { useSnapshot } from "valtio";
@@ -35,157 +36,158 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const formSchema = z.object({
-  customerName: z.string().min(1, "Required"),
-  phone: z.string().min(1, "Required"),
-  breakfast: z.object({ item: z.string(), price: z.number() }),
-  mainMenu: z.object({ item: z.string(), price: z.number() }),
-  protein: z.object({ item: z.string(), price: z.number() }),
-  drinks: z.object({ item: z.string(), price: z.number() }),
-  additionalItems: z.object({ item: z.string(), price: z.number() }),
-  waitTime: z.coerce.number().gte(1, "Must be greater than 0"),
-  total: z.coerce.number(),
-});
-
-/* 
-***** proposed update to form schema
+// ***** proposed update to form schema
 const formSchema = z.object({
   customerInfo: z.object({
     customerName: z.string().min(1, "Required"),
     phone: z.string().min(1, "Required"),
   }),
-  orderInfo: z.object({
-    breakfast: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
-    mainMenu: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
-    protein: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
-    drinks: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
-    additionalItems: z.object({ item: z.string(), price: z.number(), quantity: z.number() }),
-    waitTime: z.coerce.number().gte(1, "Must be greater than 0"),
-  }).partial().refine(({ breakfast, mainMenu, protein, drinks, additionalItems }) => {
-    if (breakfast.item === '' || mainMenu.item === '' || protein.item === '' || drinks.item === '' || additionalItems.item === '') {
-      return false
-    }
-    return true
-  }, {
-    message: "One of the fields must be defined"
-  }) 
-})
-
-*/
+  orderInfo: z
+    .object({
+      breakfast: z.object({
+        item: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+      }),
+      mainMenu: z.object({
+        item: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+      }),
+      protein: z.object({
+        item: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+      }),
+      drinks: z.object({
+        item: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+      }),
+      additionalItems: z.object({
+        item: z.string(),
+        price: z.number(),
+        quantity: z.number(),
+      }),
+      waitTime: z.coerce.number().gte(1, "Must be greater than 0"),
+    })
+    .partial()
+    .refine(
+      ({ breakfast, mainMenu, protein, drinks, additionalItems }) => {
+        if (
+          (!breakfast?.item || breakfast.item === "") &&
+          (!mainMenu?.item || mainMenu.item === "") &&
+          (!protein?.item || protein.item === "") &&
+          (!drinks?.item || drinks.item === "") &&
+          (!additionalItems?.item || additionalItems.item === "")
+        ) {
+          toast.error("One of the place order fields must be filled", {
+            duration: 4000,
+            position: "top-right",
+          });
+          return false;
+        }
+        return true;
+      },
+      {
+        message: "One of the fields must be defined",
+      }
+    ),
+});
 
 const languages = [
   { label: "English", value: "en", price: 1200 },
-  { label: "French", value: "fr", price: 1200 },
-  { label: "German", value: "de", price: 1200 },
+  { label: "French", value: "fr", price: 1600 },
+  { label: "German", value: "de", price: 1300 },
   { label: "Spanish", value: "es", price: 1200 },
-  { label: "Portuguese", value: "pt", price: 1200 },
-  { label: "Russian", value: "ru", price: 1200 },
-  { label: "Japanese", value: "ja", price: 1200 },
-  { label: "Korean", value: "ko", price: 1200 },
+  { label: "Portuguese", value: "pt", price: 2200 },
+  { label: "Russian", value: "ru", price: 1000 },
+  { label: "Japanese", value: "ja", price: 1900 },
+  { label: "Korean", value: "ko", price: 3200 },
   { label: "Chinese", value: "zh", price: 1200 },
 ] as const;
 
 const OrderForm = () => {
   const snap = useSnapshot(state);
   const [subtotal, setSubtotal] = useState(0);
+  const navigate = useNavigate();
   // 1. Define your form.
 
-  /* **** Proposed form 
-    const form = useForm<z.infer<typeof formSchema>>({
-      reesolver: zodResolver(formSchema),
-      defaultValues: {
-        customerInfo: {
-          customerName: "",
-          phone: "",
-        },
-        orderInfo: {
-          breakfast: {
-            item: "",
-            price: 0,
-            quantity: 0
-          },
-          mainMenu: {
-            item: "",
-            price: 0,
-            quantity: 0
-          },
-          protein: {
-            item: "",
-            price: 0,
-            quantity: 0
-          },
-          drinks: {
-            item: "",
-            price: 0,
-            quantity: 0
-          },
-          additionalItems: {
-            item: "",
-            price: 0,
-            quantity: 0
-          },
-          waitTime: 0
-        }
-      }
-    })
-  */
+  //  ** Proposed form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customerName: "",
-      phone: "",
-      breakfast: {
-        item: "",
-        price: 0,
+      customerInfo: {
+        customerName: "",
+        phone: "",
       },
-      mainMenu: {
-        item: "",
-        price: 0,
+      orderInfo: {
+        breakfast: {
+          item: "",
+          price: 0,
+          quantity: 0,
+        },
+        mainMenu: {
+          item: "",
+          price: 0,
+          quantity: 0,
+        },
+        protein: {
+          item: "",
+          price: 0,
+          quantity: 0,
+        },
+        drinks: {
+          item: "",
+          price: 0,
+          quantity: 0,
+        },
+        additionalItems: {
+          item: "",
+          price: 0,
+          quantity: 0,
+        },
+        waitTime: 0,
       },
-      protein: {
-        item: "",
-        price: 0,
-      },
-      drinks: {
-        item: "",
-        price: 0,
-      },
-      additionalItems: {
-        item: "",
-        price: 0,
-      },
-      waitTime: 0,
-      total: subtotal,
     },
   });
+
   const { watch, reset } = form;
   useEffect(() => {
-    if (snap.submitted) reset();
+    if (snap.submitted) {
+      reset();
+      navigate(0);
+    }
     watch((values) => {
       const totalFoodPrice = [
-        values.breakfast?.price,
-        values.mainMenu?.price,
-        values.protein?.price,
-        values.additionalItems?.price,
-        values.drinks?.price,
+        values.orderInfo?.breakfast?.price,
+        values.orderInfo?.mainMenu?.price,
+        values.orderInfo?.protein?.price,
+        values.orderInfo?.additionalItems?.price,
+        values.orderInfo?.drinks?.price,
       ];
       if (!totalFoodPrice.includes(undefined)) {
         const calculatedTotal =
-          values.breakfast!.price! +
-          values.mainMenu!.price! +
-          values.protein!.price! +
-          values.additionalItems!.price! +
-          values.drinks!.price!;
+          values.orderInfo!.breakfast!.price! +
+          values.orderInfo!.mainMenu!.price! +
+          values.orderInfo!.protein!.price! +
+          values.orderInfo!.additionalItems!.price! +
+          values.orderInfo!.drinks!.price!;
         setSubtotal(calculatedTotal);
       }
     });
     // form.setValue("total", calculatedTotal);
     // return subscription.unsubscribe();
-  }, [reset, watch, snap.submitted, subtotal]);
+  }, [reset, watch, snap.submitted, subtotal, navigate]);
+
+  // const watchedValues = watch();
+  // console.log(watchedValues);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    form.setValue("total", subtotal);
+    // form.setValue("total", subtotal);
+    state.formStep = 1;
     console.log(values, subtotal);
     if (values) {
       state.showPreview = true;
@@ -193,11 +195,11 @@ const OrderForm = () => {
 
       state.summary.map((data, index) => {
         if (index === 1) {
-          data.description = values.customerName;
+          data.description = values.customerInfo.customerName;
         }
 
         if (index === 2) {
-          data.description = values.waitTime + "mins";
+          data.description = values.orderInfo.waitTime + "mins";
         }
 
         if (index === 3) {
@@ -210,16 +212,16 @@ const OrderForm = () => {
     }
   };
   return (
-    <div className={`bg-white p-8 ${snap.showPreview ? "hidden" : "block"}`}>
+    <div className={`bg-white p-8 ${snap.formStep === 0 ? "block" : "hidden"}`}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="">
           <p className="text-2xl font-semibold">Customer Details</p>
-          <div className="flex justify-between items-center w-full py-6">
+          <div className="block lg:flex justify-between items-center w-full py-6">
             <FormField
               control={form.control}
-              name="customerName"
+              name="customerInfo.customerName"
               render={({ field }) => (
-                <FormItem className="w-1/2 mr-3">
+                <FormItem className="w-full lg:w-1/2 lg:mr-3">
                   <FormLabel>Customer Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Customer name" {...field} />
@@ -231,9 +233,9 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="phone"
+              name="customerInfo.phone"
               render={({ field }) => (
-                <FormItem className="w-1/2 ml-3">
+                <FormItem className="w-full lg:w-1/2 lg:ml-3 mt-3 lg:mt-0">
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter phone number" {...field} />
@@ -245,12 +247,12 @@ const OrderForm = () => {
             />
           </div>
           <p className="text-2xl font-semibold pb-6">Place Order</p>
-          <div className="flex justify-between items-center w-full pb-3">
+          <div className="block lg:flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="breakfast.item"
+              name="orderInfo.breakfast.item"
               render={({ field }) => (
-                <FormItem className="w-1/2 mr-3">
+                <FormItem className="w-full lg:w-1/2 lg:mr-3">
                   <FormLabel>Breakfast</FormLabel>
 
                   <Popover>
@@ -279,10 +281,17 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue(`breakfast.item`, language.label);
                                 form.setValue(
-                                  "breakfast.price",
+                                  `orderInfo.breakfast.item`,
+                                  language.label
+                                );
+                                form.setValue(
+                                  "orderInfo.breakfast.price",
                                   language.price
+                                );
+                                form.setValue(
+                                  "orderInfo.breakfast.quantity",
+                                  1
                                 );
                               }}
                             >
@@ -311,9 +320,9 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="mainMenu.item"
+              name="orderInfo.mainMenu.item"
               render={({ field }) => (
-                <FormItem className="w-1/2 ml-3">
+                <FormItem className="w-full lg:w-1/2 lg:ml-3 mt-3 lg:mt-0">
                   <FormLabel>Main menu</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -341,8 +350,15 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("mainMenu.item", language.label);
-                                form.setValue("mainMenu.price", language.price);
+                                form.setValue(
+                                  "orderInfo.mainMenu.item",
+                                  language.label
+                                );
+                                form.setValue(
+                                  "orderInfo.mainMenu.price",
+                                  language.price
+                                );
+                                form.setValue("orderInfo.mainMenu.quantity", 1);
                               }}
                             >
                               <Check
@@ -369,12 +385,12 @@ const OrderForm = () => {
               )}
             />
           </div>
-          <div className="flex justify-between items-center w-full pb-3">
+          <div className="block lg:flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="protein.item"
+              name="orderInfo.protein.item"
               render={({ field }) => (
-                <FormItem className="w-1/2 mr-3">
+                <FormItem className="w-full lg:w-1/2 lg:mr-3">
                   <FormLabel>Protein</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -402,8 +418,15 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("protein.item", language.label);
-                                form.setValue("protein.price", language.price);
+                                form.setValue(
+                                  "orderInfo.protein.item",
+                                  language.label
+                                );
+                                form.setValue(
+                                  "orderInfo.protein.price",
+                                  language.price
+                                );
+                                form.setValue("orderInfo.protein.quantity", 1);
                               }}
                             >
                               <Check
@@ -431,9 +454,9 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="drinks.item"
+              name="orderInfo.drinks.item"
               render={({ field }) => (
-                <FormItem className="w-1/2 ml-3">
+                <FormItem className="w-full lg:w-1/2 lg:ml-3 mt-3 lg:mt-0">
                   <FormLabel>Drinks</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -461,8 +484,15 @@ const OrderForm = () => {
                               value={language.label}
                               key={language.value}
                               onSelect={() => {
-                                form.setValue("drinks.item", language.label);
-                                form.setValue("drinks.price", language.price);
+                                form.setValue(
+                                  "orderInfo.drinks.item",
+                                  language.label
+                                );
+                                form.setValue(
+                                  "orderInfo.drinks.price",
+                                  language.price
+                                );
+                                form.setValue("orderInfo.drinks.quantity", 1);
                               }}
                             >
                               <Check
@@ -489,12 +519,12 @@ const OrderForm = () => {
               )}
             />
           </div>
-          <div className="flex justify-between items-center w-full pb-3">
+          <div className="block lg:flex justify-between items-center w-full pb-3">
             <FormField
               control={form.control}
-              name="additionalItems.item"
+              name="orderInfo.additionalItems.item"
               render={({ field }) => (
-                <FormItem className="w-1/2 mr-3">
+                <FormItem className="w-full lg:w-1/2 lg:mr-3">
                   <FormLabel>Additonal Items</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -523,12 +553,16 @@ const OrderForm = () => {
                               key={language.value}
                               onSelect={() => {
                                 form.setValue(
-                                  "additionalItems.item",
+                                  "orderInfo.additionalItems.item",
                                   language.label
                                 );
                                 form.setValue(
-                                  "additionalItems.price",
+                                  "orderInfo.additionalItems.price",
                                   language.price
+                                );
+                                form.setValue(
+                                  "orderInfo.additionalItems.quantity",
+                                  1
                                 );
                               }}
                             >
@@ -557,9 +591,9 @@ const OrderForm = () => {
             />
             <FormField
               control={form.control}
-              name="waitTime"
+              name="orderInfo.waitTime"
               render={({ field }) => (
-                <FormItem className="w-1/2 ml-3">
+                <FormItem className="w-full lg:w-1/2 lg:ml-3 mt-3 lg:mt-0">
                   <FormLabel>Estimated time (min)</FormLabel>
                   <FormControl>
                     <Input
@@ -574,9 +608,15 @@ const OrderForm = () => {
               )}
             />
           </div>
-          <Button type="submit">Submit</Button>
+          <Button
+            className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"
+            type="submit"
+          >
+            Submit
+          </Button>
         </form>
       </Form>
+      <Toaster />
     </div>
   );
 };

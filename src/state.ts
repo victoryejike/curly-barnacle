@@ -29,6 +29,7 @@ export const summaryInitialValues = [
 export const state = proxy({
   order: {},
   data: [] as any[],
+  formStep: 0,
   showPreview: false,
   submitted: false,
   summary: summaryInitialValues,

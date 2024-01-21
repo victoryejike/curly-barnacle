@@ -78,6 +78,7 @@
   }
 }
 
-body {
+body,
+#RFS-StepperContainer {
   font-family: "Montserrat Alternates", "san-serif";
 }

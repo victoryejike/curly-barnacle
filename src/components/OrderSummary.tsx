@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Check } from "lucide-react";
 
 import { useSnapshot } from "valtio";
@@ -5,6 +6,7 @@ import { state } from "@/state";
 // import toast from "react-hot-toast";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
+import { Toaster, toast } from "react-hot-toast";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,12 +23,24 @@ type CardProps = React.ComponentProps<typeof Card>;
 
 const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
-  const handleClick = () => {
-    state.data.push(state.order);
-    localStorage.setItem("orders", JSON.stringify(snap.data));
-    console.log(snap.data);
+  const handleRefresh = () => {
+    state.order = {};
+    state.formStep = 0;
+  };
+
+  const handleClick = async () => {
+    await toast.success("Order created successfully", {
+      duration: 4000,
+      position: "top-right",
+    });
+    const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
+    const updatedOrders = [...storedOrders, state.order];
+
+    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+
+    console.log(updatedOrders);
     state.submitted = true;
-    state.showPreview = false;
+    state.formStep = 0;
     state.summary = [
       {
         title: "Order ID.",
@@ -51,7 +65,13 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     ];
   };
   return (
-    <Card className={cn("w-full", className)} {...props}>
+    <Card
+      className={cn(
+        `w-full ${snap.formStep === 1 ? "block" : "hidden"}`,
+        className
+      )}
+      {...props}
+    >
       <CardHeader>
         <CardTitle>Order Summary</CardTitle>
         <CardDescription>Summary of customer order.</CardDescription>
@@ -73,12 +93,16 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
           ))}
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="w-full lg:w-3/5 mx-auto grid grid-cols-2 gap-3 justify-center">
+        <Button className="w-full" onClick={handleRefresh}>
+          {" "}
+          Refresh
+        </Button>
         <Button className="w-full bg-orange-500" onClick={handleClick}>
           <Check className="mr-2 h-4 w-4" /> Order
         </Button>
-        <Button className="w-full mt-3"> Refresh</Button>
       </CardFooter>
+      <Toaster />
     </Card>
   );
 };
