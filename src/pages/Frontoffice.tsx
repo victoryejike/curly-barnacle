@@ -10,41 +10,74 @@ import {
 } from "@/components/ui/table";
 import CountdownTimer from "@/components/CountdownTimer";
 
-// import { useSnapshot } from "valtio";
-// import { state } from "@/state";
-import { useEffect, useState } from "react";
+import Logo from "../assets/bukkahut.svg";
+
+import { useSnapshot } from "valtio";
+import { state } from "@/state";
+import { useCallback, useEffect, useMemo } from "react";
 import { customAlphabet } from "nanoid";
-import { LucideTrash2 } from "lucide-react";
 const nanoid = customAlphabet("1234567890abcdef", 10);
 
 const Frontoffice = () => {
-  // const snap = useSnapshot(state);
-  const [orders, setOrders] = useState([]);
-  useEffect(() => {
-    const placedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
-    console.log(placedOrders);
-    setOrders(placedOrders);
-  }, []);
+  const snap = useSnapshot(state);
+  // const [orders, setOrders] = useState<any>([]);
+  const placedOrders = useMemo(
+    () => JSON.parse(localStorage.getItem("orders")!) || [],
+    []
+  );
+  // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
 
-  const handleCountdownFinish = (id: string) => {
-    // Update orderInfo with waitTime set to 0
-    const updatedOrders: any = orders.filter((order: any) => order.id !== id);
-    // const updatedOrders: any = orders.map((order: any) => {
-    //   if (order.id === id) {
-    //     // return {
-    //     //   ...order,
-    //     //   orderInfo: {
-    //     //     ...order.orderInfo,
-    //     //     waitTime: 0,
-    //     //   },
-    //     // };
-    //   }
-    //   return order; // Return the unchanged order for other items
-    // });
+  const handleCountdownFinish = useCallback(
+    (id: string) => {
+      // setCompletedCountdowns((prevCompletedCountdowns: any) => [
+      //   ...prevCompletedCountdowns,
+      //   id,
+      // ]);
+      // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
+      // Update orderInfo with waitTime set to 0
+      // orders.filter((order: any) => order.id !== id);
+      // setCompletedCountdowns(updatedOrder);
+      const updatedOrders: any = placedOrders.map((order: any) => {
+        if (order.id === id) {
+          return {
+            ...order,
+            orderInfo: {
+              ...order.orderInfo,
+              waitTime: 0,
+            },
+          };
+        }
+        return order; // Return the unchanged order for other items
+      });
 
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
-    setOrders(updatedOrders);
+      localStorage.setItem("orders", JSON.stringify(updatedOrders));
+      // setOrders(updatedOrders);
+    },
+    [placedOrders]
+  );
+
+  const getOrder = (orderInfo: any) => {
+    return Object.values(orderInfo)
+      .filter((item: any) => item.item !== "")
+      .map((item: any) => item.item)
+      .join(", ");
   };
+
+  useEffect(() => {
+    console.log(placedOrders);
+  }, [placedOrders, snap.showDelete]);
+
+  if (placedOrders && placedOrders.length < 1) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <div className="items-center flex flex-col justify-center">
+          <img src={Logo} alt="logo" />
+          <p className="pt-4">No order has been added yet.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-4">
       <Table>
@@ -56,26 +89,25 @@ const Frontoffice = () => {
             <TableHead>Status</TableHead>
             <TableHead className="">Order</TableHead>
             <TableHead className="">Ready in</TableHead>
-            <TableHead className=""></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {orders.map((invoice: any) => (
+          {placedOrders.map((invoice: any) => (
             <TableRow key={nanoid()}>
               <TableCell className="font-medium">{invoice.id}</TableCell>
               <TableCell>{invoice.customerInfo.customerName}</TableCell>
-              <TableCell>{invoice.customerInfo.customerName}</TableCell>
-              <TableCell>{invoice.customerInfo.customerName}</TableCell>
+              <TableCell>
+                {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
+              </TableCell>
+              <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
               <TableCell>
                 <CountdownTimer
                   waitTime={invoice.orderInfo.waitTime}
                   onCountdownFinish={() => handleCountdownFinish(invoice.id)}
                   identifier={invoice.id}
+                  data={placedOrders}
                   key={invoice.id}
                 />
-              </TableCell>
-              <TableCell className="text-right">
-                <LucideTrash2 className="text-red-400 cursor-pointer" />
               </TableCell>
             </TableRow>
           ))}

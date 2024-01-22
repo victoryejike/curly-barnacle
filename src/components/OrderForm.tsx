@@ -100,15 +100,16 @@ const formSchema = z.object({
 });
 
 const languages = [
-  { label: "English", value: "en", price: 1200 },
-  { label: "French", value: "fr", price: 1600 },
-  { label: "German", value: "de", price: 1300 },
-  { label: "Spanish", value: "es", price: 1200 },
-  { label: "Portuguese", value: "pt", price: 2200 },
-  { label: "Russian", value: "ru", price: 1000 },
-  { label: "Japanese", value: "ja", price: 1900 },
-  { label: "Korean", value: "ko", price: 3200 },
-  { label: "Chinese", value: "zh", price: 1200 },
+  { label: "Jollof Rice", value: "en", price: 1200 },
+  { label: "Nigerian Fried Rice", value: "fr", price: 1600 },
+  { label: "Meat Pie", value: "de", price: 1300 },
+  { label: "Egusi Soup", value: "es", price: 1200 },
+  { label: "Spinach Stew (Efo Riro)", value: "pt", price: 2200 },
+  { label: "Beef Stew", value: "ru", price: 1000 },
+  { label: "African Buns – Nigerian Buns", value: "ja", price: 1900 },
+  { label: "Plantain Puff Puff", value: "ko", price: 3200 },
+  { label: "Spicy Puff Puff Recipe", value: "zh", price: 1200 },
+  { label: "Chicken Stew", value: "we", price: 1200 },
 ] as const;
 
 const OrderForm = () => {

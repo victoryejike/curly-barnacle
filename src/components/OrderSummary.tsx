@@ -18,11 +18,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
 const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
+  const navigate = useNavigate();
   const handleRefresh = () => {
     state.order = {};
     state.formStep = 0;
@@ -40,7 +42,6 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
 
     console.log(updatedOrders);
     state.submitted = true;
-    state.formStep = 0;
     state.summary = [
       {
         title: "Order ID.",
@@ -63,6 +64,9 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
         description: 0,
       },
     ];
+    // navigate(0);
+
+    navigate("/view");
   };
   return (
     <Card

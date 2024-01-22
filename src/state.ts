@@ -30,5 +30,6 @@ export const state = proxy({
   formStep: 0,
   showPreview: false,
   submitted: false,
+  showDelete: false,
   summary: summaryInitialValues,
 });
