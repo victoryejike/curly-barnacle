@@ -40,7 +40,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // ***** proposed update to form schema
-const formSchema = z.object({
+const formSchema: any = z.object({
   id: z.string(),
   customerInfo: z.object({
     customerName: z.string().min(1, "Required"),

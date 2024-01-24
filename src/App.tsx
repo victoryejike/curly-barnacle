@@ -2,7 +2,13 @@ import Backoffice from "./pages/Backoffice";
 import Frontoffice from "./pages/Frontoffice";
 import Header from "./components/Header";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import Auth from "./pages/Auth";
 function App() {
   return (
     <section className="">
@@ -11,8 +17,10 @@ function App() {
         <div className="max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto lg:mx-[156px]">
           <Router>
             <Routes>
-              <Route path="/" element={<Backoffice />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/order" element={<Backoffice />} />
               <Route path="/view" element={<Frontoffice />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </Router>
         </div>
