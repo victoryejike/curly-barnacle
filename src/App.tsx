@@ -9,6 +9,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Auth from "./pages/Auth";
+import Login from "./pages/Login";
 function App() {
   return (
     <section className="">
@@ -17,7 +18,8 @@ function App() {
         <div className="max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl mx-auto lg:mx-[156px]">
           <Router>
             <Routes>
-              <Route path="/login" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/order" element={<Backoffice />} />
               <Route path="/view" element={<Frontoffice />} />
               <Route path="*" element={<Navigate to="/login" replace />} />

@@ -1,14 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import {
   Form,
   FormControl,
   FormField,
@@ -18,74 +10,43 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { getFirestore, setDoc, doc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
-export type Role = {
-  cashier?: boolean;
-  orderProcessor?: boolean;
-  kitchenSupervisor?: boolean;
-  auditAssistant?: boolean;
-};
-
-// type User = {};
-
 const formSchema: any = z.object({
-  username: z.string().min(1, "Required"),
   email: z.string().min(1, "Required"),
   password: z.string().min(8, "Required"),
-  role: z.string().min(1, "Required"),
-  location: z.string().min(1, "Required"),
 });
 
-const Auth = () => {
+const Login = () => {
   const navigate = useNavigate();
-  const db = getFirestore();
-  const userRoles = [
-    "Cashier",
-    "Audit Assistant",
-    "Kitchen Supervisor",
-    "Order processor",
-  ];
   const [type, setType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      username: "",
       email: "",
       password: "",
-      role: "",
-      location: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { email, password, role, location, username } = values;
+    console.log(values);
+    const { email, password } = values;
     try {
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      const updateUser =
-        auth.currentUser &&
-        (await updateProfile(auth.currentUser, { displayName: username }));
-      console.log(updateUser);
+
+      console.log(userCredentials);
       const user: any = userCredentials.user;
-      await setDoc(doc(db, "users", user.uid), {
-        email,
-        role,
-        location,
-        username,
-      });
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", user.accessToken);
-      toast.success("Account created successfully!!");
       navigate("/order");
     } catch (error) {
       console.log(error);
@@ -101,7 +62,6 @@ const Auth = () => {
       }
     });
   };
-
   return (
     <div className="h-[calc(100vh-6rem)] max-w-sm lg:max-w-lg mx-auto grid grid-cols-1 place-items-center">
       <div className="w-full">
@@ -109,23 +69,10 @@ const Auth = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
               control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Username" type="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input placeholder="Email" type="email" {...field} />
                   </FormControl>
@@ -159,59 +106,19 @@ const Auth = () => {
                 />
               )}
             </div>
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your role" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {userRoles.map((rolez) => (
-                        <SelectItem key={rolez} value={rolez}>
-                          {rolez}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Outlet Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Location" type="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <Button
               className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"
               type="submit"
             >
-              Sign up
+              Log In
             </Button>
-            <p className="text-center mt-3">
-              Already have an account?{" "}
+            <p className="text-center">
+              Do not have an account?{" "}
               <Link
-                to="/login"
-                className="font-medium underline underline-offset-2 text-orange-400"
+                to="/signup"
+                className="underline underline-offset-2 text-orange-400"
               >
-                Login
+                Create Account
               </Link>
             </p>
           </form>
@@ -222,4 +129,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default Login;
