@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
 const formSchema: any = z.object({
@@ -25,6 +25,7 @@ const formSchema: any = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [type, setType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -36,8 +37,9 @@ const Login = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     const { email, password } = values;
+    setLoading(true);
     try {
-      const userCredentials = await createUserWithEmailAndPassword(
+      const userCredentials = await signInWithEmailAndPassword(
         auth,
         email,
         password
@@ -47,9 +49,13 @@ const Login = () => {
       const user: any = userCredentials.user;
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", user.accessToken);
+      toast.success("Login successful!!");
       navigate("/order");
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      toast.error("An error occurred");
+      setLoading(false);
     }
   };
 
@@ -110,7 +116,7 @@ const Login = () => {
               className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"
               type="submit"
             >
-              Log In
+              {loading ? <p>Loading...</p> : <p>Log in</p>}
             </Button>
             <p className="text-center">
               Do not have an account?{" "}

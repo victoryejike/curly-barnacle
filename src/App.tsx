@@ -1,16 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Backoffice from "./pages/Backoffice";
 import Frontoffice from "./pages/Frontoffice";
 import Header from "./components/Header";
 import { Toaster } from "react-hot-toast";
+import Auth from "./pages/Auth";
+import Login from "./pages/Login";
+
+import { useAuthState } from "react-firebase-hooks/auth";
+
+// React router
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Navigate,
 } from "react-router-dom";
-import Auth from "./pages/Auth";
-import Login from "./pages/Login";
+
+// import auth firebase;
+import { auth } from "./firebase";
+
 function App() {
+  const [currentUser] = useAuthState(auth);
+  console.log(currentUser);
   return (
     <section className="">
       <Header />

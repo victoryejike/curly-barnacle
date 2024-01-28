@@ -18,8 +18,13 @@ import { useCallback, useEffect, useMemo } from "react";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
 
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase";
+import { Navigate } from "react-router-dom";
+
 const Frontoffice = () => {
   const snap = useSnapshot(state);
+  const [loggedIn] = useAuthState(auth);
   // const [orders, setOrders] = useState<any>([]);
   const placedOrders = useMemo(
     () => JSON.parse(localStorage.getItem("orders")!) || [],
@@ -69,50 +74,61 @@ const Frontoffice = () => {
 
   if (placedOrders && placedOrders.length < 1) {
     return (
-      <div className="h-screen flex justify-center items-center">
-        <div className="items-center flex flex-col justify-center">
-          <img src={Logo} alt="logo" />
-          <p className="pt-4">No order has been added yet.</p>
-        </div>
-      </div>
+      <>
+        {loggedIn ? (
+          <div className="h-screen flex justify-center items-center">
+            <div className="items-center flex flex-col justify-center">
+              <img src={Logo} alt="logo" />
+              <p className="pt-4">No order has been added yet.</p>
+            </div>
+          </div>
+        ) : (
+          <Navigate to="/login" />
+        )}
+      </>
     );
   }
 
   return (
     <div className="pt-4">
-      <Table>
-        <TableCaption>A list of your recent Orders.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Order ID</TableHead>
-            <TableHead>Customer Name</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="">Order</TableHead>
-            <TableHead className="">Ready in</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {placedOrders.map((invoice: any) => (
-            <TableRow key={nanoid()}>
-              <TableCell className="font-medium">{invoice.id}</TableCell>
-              <TableCell>{invoice.customerInfo.customerName}</TableCell>
-              <TableCell>
-                {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
-              </TableCell>
-              <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
-              <TableCell>
-                <CountdownTimer
-                  waitTime={invoice.orderInfo.waitTime}
-                  onCountdownFinish={() => handleCountdownFinish(invoice.id)}
-                  identifier={invoice.id}
-                  data={placedOrders}
-                  key={invoice.id}
-                />
-              </TableCell>
+      {" "}
+      {loggedIn ? (
+        <Table>
+          <TableCaption>A list of your recent Orders.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Order ID</TableHead>
+              <TableHead>Customer Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="">Order</TableHead>
+              <TableHead className="">Ready in</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {placedOrders.map((invoice: any) => (
+              <TableRow key={nanoid()}>
+                <TableCell className="font-medium">{invoice.id}</TableCell>
+                <TableCell>{invoice.customerInfo.customerName}</TableCell>
+                <TableCell>
+                  {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
+                </TableCell>
+                <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
+                <TableCell>
+                  <CountdownTimer
+                    waitTime={invoice.orderInfo.waitTime}
+                    onCountdownFinish={() => handleCountdownFinish(invoice.id)}
+                    identifier={invoice.id}
+                    data={placedOrders}
+                    key={invoice.id}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <Navigate to="/login" />
+      )}
     </div>
   );
 };

@@ -46,6 +46,7 @@ const formSchema: any = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const db = getFirestore();
   const userRoles = [
     "Cashier",
@@ -66,17 +67,18 @@ const Auth = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { email, password, role, location, username } = values;
+    setLoading(true);
     try {
       const userCredentials = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      const updateUser =
-        auth.currentUser &&
+
+      auth.currentUser &&
         (await updateProfile(auth.currentUser, { displayName: username }));
-      console.log(updateUser);
       const user: any = userCredentials.user;
+
       await setDoc(doc(db, "users", user.uid), {
         email,
         role,
@@ -85,10 +87,13 @@ const Auth = () => {
       });
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", user.accessToken);
+      setLoading(false);
       toast.success("Account created successfully!!");
       navigate("/order");
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      toast.error("An error occurred");
     }
   };
 
@@ -164,7 +169,7 @@ const Auth = () => {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Role</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -203,7 +208,7 @@ const Auth = () => {
               className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"
               type="submit"
             >
-              Sign up
+              {loading ? <p>Loading...</p> : <p>Sign up</p>}
             </Button>
             <p className="text-center mt-3">
               Already have an account?{" "}
