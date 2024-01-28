@@ -17,6 +17,7 @@ import { useState } from "react";
 import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const formSchema: any = z.object({
   email: z.string().min(1, "Required"),
@@ -24,6 +25,7 @@ const formSchema: any = z.object({
 });
 
 const Login = () => {
+  const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<string | any>("password");
@@ -58,6 +60,10 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  if (user) {
+    return navigate(-1);
+  }
 
   const handleType = () => {
     setType((prevState: string) => {

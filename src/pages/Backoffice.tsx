@@ -9,6 +9,7 @@ import { state } from "@/state";
 // import firebase
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
+// import { onAuthStateChanged } from "firebase/auth";
 
 // react imports
 import { Navigate } from "react-router-dom";
@@ -17,9 +18,17 @@ const Backoffice = () => {
   const { formStep } = useSnapshot(state);
   const [user] = useAuthState(auth);
 
+  //   const getCurrentUser = () => {
+  //     onAuthStateChanged;
+  //   };
+
+  if (!user) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <section className="font-primary">
-      {user ? (
+      {user && (
         <>
           <Stepper
             className="text-orange-400 text-medium justify-start"
@@ -39,8 +48,6 @@ const Backoffice = () => {
         </div> */}
           </div>
         </>
-      ) : (
-        <Navigate to="/" />
       )}
     </section>
   );
