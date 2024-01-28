@@ -62,7 +62,7 @@ const Login = () => {
   };
 
   if (user) {
-    return navigate(-1);
+    navigate(-1);
   }
 
   const handleType = () => {
