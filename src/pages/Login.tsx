@@ -17,7 +17,7 @@ import { useState } from "react";
 import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const formSchema: any = z.object({
   email: z.string().min(1, "Required"),
@@ -25,8 +25,8 @@ const formSchema: any = z.object({
 });
 
 const Login = () => {
-  const [user] = useAuthState(auth);
   const navigate = useNavigate();
+  const db = getFirestore();
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,8 +49,14 @@ const Login = () => {
 
       console.log(userCredentials);
       const user: any = userCredentials.user;
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", user.accessToken);
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      console.log(docSnap.data());
+      const currentUser = docSnap.exists() && docSnap.data();
+
+      localStorage.setItem("user", JSON.stringify(currentUser));
       toast.success("Login successful!!");
       navigate("/order");
       setLoading(false);
@@ -60,10 +66,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
-  if (user) {
-    navigate(-1);
-  }
 
   const handleType = () => {
     setType((prevState: string) => {

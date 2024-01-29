@@ -1,9 +1,8 @@
 import Logo from "../assets/bukkahut.svg";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase";
 import { signOut } from "firebase/auth";
 // import { Link } from "react-router-dom";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
 // import ui elements
 import {
@@ -11,13 +10,16 @@ import {
   DropdownMenuContent,
   //   DropdownMenuItem,
   DropdownMenuLabel,
-  //   DropdownMenuSeparator,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 const Header = () => {
-  const [currentUser] = useAuthState(auth);
-  console.log(currentUser);
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
+  //   console.log(currentUser);
 
   const handleSignout = () => {
     signOut(auth).then((result) => {
@@ -40,12 +42,21 @@ const Header = () => {
             {currentUser && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  Welcome {currentUser.displayName}
+                  <div className="flex bg-orange-500 text-white p-2 rounded-lg">
+                    <p className="mr-2">Welcome {currentUser.username}</p>
+                    <span>
+                      <ChevronDown />
+                    </span>
+                  </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
+                  <DropdownMenuLabel className="cursor-pointer font-medium">
+                    <Link to="/view">View Orders</Link>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
                   <DropdownMenuLabel
                     onClick={handleSignout}
-                    className="cursor-pointer"
+                    className="cursor-pointer text-red-500"
                   >
                     Log out
                   </DropdownMenuLabel>

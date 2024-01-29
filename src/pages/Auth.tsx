@@ -24,7 +24,7 @@ import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { getFirestore, setDoc, doc } from "firebase/firestore";
+import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 
 export type Role = {
@@ -85,8 +85,14 @@ const Auth = () => {
         location,
         username,
       });
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("token", user.accessToken);
+
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      console.log(docSnap.data());
+      const currentUser = docSnap.exists() && docSnap.data();
+
+      localStorage.setItem("user", JSON.stringify(currentUser));
       setLoading(false);
       toast.success("Account created successfully!!");
       navigate("/order");
