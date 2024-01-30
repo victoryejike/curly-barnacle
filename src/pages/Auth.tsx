@@ -89,7 +89,6 @@ const Auth = () => {
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
 
-      console.log(docSnap.data());
       const currentUser = docSnap.exists() && docSnap.data();
 
       localStorage.setItem("user", JSON.stringify(currentUser));
@@ -97,7 +96,6 @@ const Auth = () => {
       toast.success("Account created successfully!!");
       navigate("/order");
     } catch (error) {
-      console.log(error);
       setLoading(false);
       toast.error("An error occurred");
     }

@@ -31,7 +31,6 @@ const ChatRoom = () => {
   const currentUser =
     JSON.parse(localStorage.getItem("user")!) !== undefined &&
     JSON.parse(localStorage.getItem("user")!);
-  console.log(currentUser);
 
   const handleChange = (e: any) => {
     setMessage(e.target.value);
@@ -73,22 +72,29 @@ const ChatRoom = () => {
   }, [db]);
 
   return (
-    <Card className=" ml-3 border border-orange-400">
+    <Card className="mt-5 ml-3 border border-orange-400">
       <CardHeader>
         <CardTitle>Bukka hut chat room</CardTitle>
         <CardDescription>Send messages to team members.</CardDescription>
       </CardHeader>
       <CardContent className="h-[250px] overflow-y-scroll">
         {messages.map((message: any) => (
-          <div className="flex justify-start items-start" key={message.id}>
+          <div
+            className={`flex ${
+              message.email === currentUser.email
+                ? "justify-end text-right"
+                : "justify-start  text-left"
+            } items-start grow`}
+            key={message.id}
+          >
             <Avatar className="mr-2">
               <AvatarFallback>BH</AvatarFallback>
             </Avatar>
             <p
               className={`shadow-sm ${
                 message.email === currentUser.email
-                  ? "bg-orange-200"
-                  : "bg-gray-300"
+                  ? "bg-orange-200 text-right"
+                  : "bg-gray-300 text-left"
               }  my-2 rounded-md p-2 text-[13px]`}
             >
               <span className="block text-[10px] font-semibold">

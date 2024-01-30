@@ -188,12 +188,10 @@ const OrderForm = () => {
   }, [reset, watch, snap.submitted, subtotal, navigate]);
 
   // const watchedValues = watch();
-  // console.log(watchedValues);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     // form.setValue("total", subtotal);
     state.formStep = 1;
-    console.log(values, subtotal);
     if (values) {
       state.showPreview = true;
       state.order = values;

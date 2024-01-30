@@ -6,6 +6,15 @@ import { Toaster } from "react-hot-toast";
 import Auth from "./pages/Auth";
 import Login from "./pages/Login";
 
+// state
+// import { useSnapshot } from "valtio";
+// import { state } from "@/state";
+
+// firebase
+import { auth } from "@/firebase";
+// import { useAuthState } from "react-firebase-hooks/auth";
+import { onAuthStateChanged } from "firebase/auth";
+
 // React router
 import {
   BrowserRouter as Router,
@@ -13,12 +22,24 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function App() {
-  const currentUser =
-    JSON.parse(localStorage.getItem("user")!) !== undefined &&
-    JSON.parse(localStorage.getItem("user")!);
-  console.log(currentUser);
+  // const [user] = useAuthState(auth);
+  const [currentUser, setCurrentUser] = useState<any>();
+
+  // const snap = useSnapshot(state);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        <Navigate to="/login" />;
+      }
+    });
+  }, []);
+
   return (
     <section className="">
       <Router>
@@ -30,11 +51,11 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route
                 path="/order"
-                element={currentUser ? <Backoffice /> : <Navigate to="/" />}
+                element={currentUser ? <Backoffice /> : <Login />}
               />
               <Route
                 path="/view"
-                element={currentUser ? <Frontoffice /> : <Navigate to="/" />}
+                element={currentUser ? <Frontoffice /> : <Login />}
               />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>

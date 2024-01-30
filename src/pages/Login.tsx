@@ -22,6 +22,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 const formSchema: any = z.object({
   email: z.string().min(1, "Required"),
   password: z.string().min(8, "Required"),
+  username: z.string().min(8, "Required"),
 });
 
 const Login = () => {
@@ -33,11 +34,11 @@ const Login = () => {
     defaultValues: {
       email: "",
       password: "",
+      username: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     const { email, password } = values;
     setLoading(true);
     try {
@@ -47,13 +48,11 @@ const Login = () => {
         password
       );
 
-      console.log(userCredentials);
       const user: any = userCredentials.user;
 
       const docRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(docRef);
 
-      console.log(docSnap.data());
       const currentUser = docSnap.exists() && docSnap.data();
 
       localStorage.setItem("user", JSON.stringify(currentUser));
@@ -61,7 +60,6 @@ const Login = () => {
       navigate("/order");
       setLoading(false);
     } catch (error) {
-      console.log(error);
       toast.error("An error occurred");
       setLoading(false);
     }
@@ -86,9 +84,22 @@ const Login = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="Email" type="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Username" type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Logo from "../assets/bukkahut.svg";
 import { auth } from "@/firebase";
 import { signOut } from "firebase/auth";
 // import { Link } from "react-router-dom";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // import ui elements
 import {
@@ -14,17 +15,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
-  const currentUser =
-    JSON.parse(localStorage.getItem("user")!) !== undefined &&
-    JSON.parse(localStorage.getItem("user")!);
-  //   console.log(currentUser);
+  //   const [user] = useAuthState(auth);
+  const [currentUser, setCurrentUser] = useState<any>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+      }
+    });
+  }, []);
 
   const handleSignout = () => {
-    signOut(auth).then((result) => {
-      console.log(result);
-      <Navigate to="/login" />;
+    signOut(auth).then(() => {
+      localStorage.removeItem("user");
+      navigate("/login");
+      navigate(0);
     });
   };
 
@@ -43,15 +55,18 @@ const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <div className="flex bg-orange-500 text-white p-2 rounded-lg">
-                    <p className="mr-2">Welcome {currentUser.username}</p>
+                    <p className="mr-2">Welcome {currentUser.displayName}</p>
                     <span>
                       <ChevronDown />
                     </span>
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuLabel className="cursor-pointer font-medium">
+                  <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
                     <Link to="/view">View Orders</Link>
+                  </DropdownMenuLabel>
+                  <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
+                    <Link to="/order">Create Order</Link>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel

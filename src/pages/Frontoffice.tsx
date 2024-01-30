@@ -65,14 +65,12 @@ const Frontoffice = () => {
       .join(", ");
   };
 
-  useEffect(() => {
-    console.log(placedOrders);
-  }, [placedOrders, snap.showDelete]);
+  useEffect(() => {}, [placedOrders, snap.showDelete]);
 
   if (placedOrders && placedOrders.length < 1) {
     return (
       <>
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col-reverse justify-between">
           <div className="h-screen flex justify-center items-center grow">
             <div className="items-center flex flex-col justify-center">
               <img src={Logo} alt="logo" />
@@ -86,8 +84,8 @@ const Frontoffice = () => {
   }
 
   return (
-    <div className="pt-4 flex items-start">
-      <Table className="w-3/5">
+    <div className="pt-4 flex flex-col-reverse">
+      <Table className="w-full">
         <TableCaption>A list of your recent Orders.</TableCaption>
         <TableHeader>
           <TableRow>
@@ -120,7 +118,7 @@ const Frontoffice = () => {
           ))}
         </TableBody>
       </Table>
-      <div className="w-2/5">
+      <div className="w-full">
         <ChatRoom />
       </div>
     </div>
