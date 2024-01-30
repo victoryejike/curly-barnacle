@@ -72,7 +72,7 @@ const ChatRoom = () => {
   }, [db]);
 
   return (
-    <Card className="mt-5 ml-3 border border-orange-400">
+    <Card className="my-5 ml-3 border border-orange-400">
       <CardHeader>
         <CardTitle>Bukka hut chat room</CardTitle>
         <CardDescription>Send messages to team members.</CardDescription>
