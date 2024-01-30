@@ -72,40 +72,42 @@ const ChatRoom = () => {
   }, [db]);
 
   return (
-    <Card className="my-5 ml-3 border border-orange-400">
-      <CardHeader>
-        <CardTitle>Bukka hut chat room</CardTitle>
-        <CardDescription>Send messages to team members.</CardDescription>
-      </CardHeader>
-      <CardContent className="h-[250px] overflow-y-scroll">
-        {messages.map((message: any) => (
-          <div
-            className={`flex ${
-              message.email === currentUser.email
-                ? "justify-end text-right"
-                : "justify-start  text-left"
-            } items-start grow`}
-            key={message.id}
-          >
-            <Avatar className="mr-2">
-              <AvatarFallback>BH</AvatarFallback>
-            </Avatar>
-            <p
-              className={`shadow-sm ${
-                message.email === currentUser.email
-                  ? "bg-orange-200 text-right"
-                  : "bg-gray-300 text-left"
-              }  my-2 rounded-md p-2 text-[13px]`}
-            >
-              <span className="block text-[10px] font-semibold">
-                {message.name}
-              </span>
-              {message.text}
-            </p>
-          </div>
-        ))}
+    <>
+      {currentUser.role !== "Cashier" ? (
+        <Card className="my-5 ml-3 border border-orange-400">
+          <CardHeader className="border-b mb-3 border-b-orange-400">
+            <CardTitle>Bukka hut chat room</CardTitle>
+            <CardDescription>Send messages to team members.</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[250px] overflow-y-scroll">
+            {messages.map((message: any) => (
+              <div
+                className={`flex ${
+                  message.email === currentUser.email
+                    ? "justify-end text-right"
+                    : "justify-start  text-left"
+                } items-start grow`}
+                key={message.id}
+              >
+                <Avatar className="mr-2">
+                  <AvatarFallback>BH</AvatarFallback>
+                </Avatar>
+                <p
+                  className={`shadow-sm ${
+                    message.email === currentUser.email
+                      ? "bg-orange-200 text-right"
+                      : "bg-gray-300 text-left"
+                  }  my-2 rounded-md p-2 text-[13px]`}
+                >
+                  <span className="block text-[10px] font-semibold">
+                    {message.name}
+                  </span>
+                  {message.text}
+                </p>
+              </div>
+            ))}
 
-        {/* <form>
+            {/* <form>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Name</Label>
@@ -127,27 +129,31 @@ const ChatRoom = () => {
             </div>
           </div>
         </form> */}
-      </CardContent>
-      <span ref={scroll}></span>
-      <CardFooter ref={scroll}>
-        <form
-          onSubmit={handleSubmit}
-          className="flex justify-between items-center"
-        >
-          <Input
-            onChange={handleChange}
-            value={message}
-            id="name"
-            className="py-3"
-            placeholder="Message"
-          />
-          <Button type="submit" className=" ml-2">
-            send
-          </Button>
-        </form>
-      </CardFooter>
-      <Toaster />
-    </Card>
+          </CardContent>
+          <span ref={scroll}></span>
+          <CardFooter ref={scroll}>
+            <form
+              onSubmit={handleSubmit}
+              className="flex justify-between items-center"
+            >
+              <Input
+                onChange={handleChange}
+                value={message}
+                id="name"
+                className="py-3"
+                placeholder="Message"
+              />
+              <Button type="submit" className=" ml-2">
+                send
+              </Button>
+            </form>
+          </CardFooter>
+          <Toaster />
+        </Card>
+      ) : (
+        ""
+      )}
+    </>
   );
 };
 

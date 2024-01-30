@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { Toaster, toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
@@ -36,13 +37,28 @@ export type Role = {
 
 // type User = {};
 
-const formSchema: any = z.object({
-  username: z.string().min(1, "Required"),
-  email: z.string().min(1, "Required"),
-  password: z.string().min(8, "Required"),
-  role: z.string().min(1, "Required"),
-  location: z.string().min(1, "Required"),
-});
+const formSchema: any = z
+  .object({
+    username: z.string().min(1, "Required"),
+    email: z.string().min(1, "Required"),
+    password: z.string().min(8, "Required"),
+    confirmPassword: z.string().min(8, "Required"),
+    role: z.string().min(1, "Required"),
+    location: z.string().min(1, "Required"),
+  })
+  .refine(
+    (data) => {
+      if (data.password !== data.confirmPassword) {
+        return false;
+      }
+      return true;
+      //   return data.password === data.confirmPassword;
+    },
+    {
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    }
+  );
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -55,13 +71,16 @@ const Auth = () => {
     "Order processor",
   ];
   const [type, setType] = useState<string | any>("password");
+  const [confirmType, setConfirmType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
       email: "",
       password: "",
       role: "",
       location: "",
+      confirmPassword: "",
     },
   });
 
@@ -111,37 +130,91 @@ const Auth = () => {
     });
   };
 
+  const handleConfirmType = () => {
+    setConfirmType((prevState: string) => {
+      if (prevState === "password") {
+        return "text";
+      } else if (prevState === "text") {
+        return "password";
+      }
+    });
+  };
+
   return (
     <div className="h-[calc(100vh-6rem)] max-w-sm lg:max-w-lg mx-auto grid grid-cols-1 place-items-center">
       <div className="w-full">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Username" type="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Email" type="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="block lg:grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem className="mb-3 lg:mb-0">
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Username" type="text" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Email" type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="block lg:grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="mb-3 lg:mb-0">
+                    <FormLabel>Role</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {userRoles.map((rolez) => (
+                          <SelectItem key={rolez} value={rolez}>
+                            {rolez}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Outlet Location</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Location" type="text" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <div className="relative">
               <FormField
                 control={form.control}
@@ -168,46 +241,36 @@ const Auth = () => {
                 />
               )}
             </div>
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+            <div className="relative">
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your role" />
-                      </SelectTrigger>
+                      <Input
+                        placeholder="Password"
+                        type={confirmType}
+                        {...field}
+                      />
                     </FormControl>
-                    <SelectContent>
-                      {userRoles.map((rolez) => (
-                        <SelectItem key={rolez} value={rolez}>
-                          {rolez}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {confirmType === "password" ? (
+                <EyeOff
+                  className="absolute right-5 top-1/2 cursor-pointer"
+                  onClick={handleConfirmType}
+                />
+              ) : (
+                <Eye
+                  className="absolute right-5 top-1/2 cursor-pointer"
+                  onClick={handleConfirmType}
+                />
               )}
-            />
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Outlet Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Location" type="text" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            </div>
             <Button
               className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"
               type="submit"

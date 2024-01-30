@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { Toaster, toast } from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
@@ -31,6 +32,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
