@@ -3,7 +3,7 @@ import Logo from "../assets/bukkahut.svg";
 import { auth } from "@/firebase";
 import { signOut } from "firebase/auth";
 // import { Link } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 // import ui elements
 import {
@@ -19,18 +19,24 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useSnapshot } from "valtio";
+import { state } from "@/state";
+
 const Header = () => {
-  //   const [user] = useAuthState(auth);
+  const snap = useSnapshot(state);
+  const location = useLocation();
+  const { pathname } = location;
   const [currentUser, setCurrentUser] = useState<any>();
   const navigate = useNavigate();
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
+      const localUser = snap.user;
+      if (user && localUser !== null) {
         setCurrentUser(user);
       }
     });
-  }, []);
+  }, [snap]);
 
   const handleSignout = () => {
     signOut(auth).then(() => {
@@ -52,7 +58,7 @@ const Header = () => {
             </p>
           </div>
           <div>
-            {currentUser && (
+            {currentUser && pathname !== "/login" && pathname !== "/signup" && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <div className="flex bg-orange-500 text-white p-2 rounded-lg">

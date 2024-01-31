@@ -25,7 +25,7 @@ import { EyeOff, Eye } from "lucide-react";
 import { useState } from "react";
 import { auth } from "@/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
+import { getFirestore, setDoc, doc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 
 export type Role = {
@@ -41,8 +41,12 @@ const formSchema: any = z
   .object({
     username: z.string().min(1, "Required"),
     email: z.string().min(1, "Required"),
-    password: z.string().min(8, "Required"),
-    confirmPassword: z.string().min(8, "Required"),
+    password: z
+      .string()
+      .min(8, "Passwords must contain a minimum of 8 characters"),
+    confirmPassword: z
+      .string()
+      .min(8, "Must contain a minimum of 8 characters"),
     role: z.string().min(1, "Required"),
     location: z.string().min(1, "Required"),
   })
@@ -52,7 +56,6 @@ const formSchema: any = z
         return false;
       }
       return true;
-      //   return data.password === data.confirmPassword;
     },
     {
       message: "Passwords do not match",
@@ -105,15 +108,9 @@ const Auth = () => {
         username,
       });
 
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-
-      const currentUser = docSnap.exists() && docSnap.data();
-
-      localStorage.setItem("user", JSON.stringify(currentUser));
       setLoading(false);
       toast.success("Account created successfully!!");
-      navigate("/order");
+      navigate("/login");
     } catch (error) {
       setLoading(false);
       toast.error("An error occurred");

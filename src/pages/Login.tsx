@@ -20,10 +20,13 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
+// import { useSnapshot } from "valtio";
+import { state } from "@/state";
+
 const formSchema: any = z.object({
   email: z.string().min(1, "Required"),
   password: z.string().min(8, "Required"),
-  username: z.string().min(8, "Required"),
+  username: z.string().min(1, "Required"),
 });
 
 const Login = () => {
@@ -57,12 +60,21 @@ const Login = () => {
 
       const currentUser = docSnap.exists() && docSnap.data();
 
+      state.user = currentUser;
+
       localStorage.setItem("user", JSON.stringify(currentUser));
       toast.success("Login successful!!");
       navigate("/order");
       setLoading(false);
-    } catch (error) {
-      toast.error("An error occurred");
+    } catch (error: any) {
+      console.log(error.code);
+      if (error.code === "auth/user-not-found") {
+        toast.error(
+          `User not found. \n Please check that your details are correct`
+        );
+      } else {
+        toast.error("An error occurred, please try again");
+      }
       setLoading(false);
     }
   };
