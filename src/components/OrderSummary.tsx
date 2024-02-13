@@ -19,18 +19,45 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import {
+  // addDoc,
+  // collection,
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+} from "firebase/firestore";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
 const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
   const navigate = useNavigate();
+  const db = getFirestore();
   const handleRefresh = () => {
     state.order = {};
     state.formStep = 0;
   };
 
-  const handleClick = async () => {
+  const handleClick = async (e: any) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem("user")!);
+
+    const docRef = doc(db, "orders", user.location);
+    const docSnap = await getDoc(docRef);
+
+    console.log(user, user.location, docSnap.exists());
+
+    if (docSnap.exists()) {
+      await setDoc(doc(db, "orders", user.location), state.order, {
+        merge: true,
+      });
+    } else {
+      await setDoc(doc(db, "orders", user.location), {
+        locationOrder: [state.order],
+      });
+    }
+
     await toast.success("Order created successfully", {
       duration: 4000,
       position: "top-right",

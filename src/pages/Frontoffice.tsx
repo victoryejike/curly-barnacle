@@ -12,17 +12,18 @@ import CountdownTimer from "@/components/CountdownTimer";
 
 import Logo from "../assets/bukkahut.svg";
 
-import { useSnapshot } from "valtio";
-import { state } from "@/state";
+// import { useSnapshot } from "valtio";
+// import { state } from "@/state";
 import { useCallback, useEffect, useMemo } from "react";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
+// import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 import ChatRoom from "@/components/ChatRoom";
 
 const Frontoffice = () => {
-  const snap = useSnapshot(state);
-  // const [orders, setOrders] = useState<any>([]);
+  // const snap = useSnapshot(state);
+  // const [setOrders] = useState<any>([]);
   const placedOrders = useMemo(
     () => JSON.parse(localStorage.getItem("orders")!) || [],
     []
@@ -65,7 +66,10 @@ const Frontoffice = () => {
       .join(", ");
   };
 
-  useEffect(() => {}, [placedOrders, snap.showDelete]);
+  useEffect(() => {
+    // placedOrders;
+    // setOrders(JSON.parse(localStorage.getItem("orders")!));
+  });
 
   if (placedOrders && placedOrders.length < 1) {
     return (
@@ -106,6 +110,14 @@ const Frontoffice = () => {
               </TableCell>
               <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
               <TableCell>
+                {/* <CountdownCircleTimer
+                  isPlaying
+                  colors="#7E2E84"
+                  duration={invoice.orderInfo.waitTime}
+                  initialRemainingTime={invoice.orderInfo.waitTime}
+                >
+                  {({ remainingTime }) => remainingTime}
+                </CountdownCircleTimer> */}
                 <CountdownTimer
                   waitTime={invoice.orderInfo.waitTime}
                   onCountdownFinish={() => handleCountdownFinish(invoice.id)}

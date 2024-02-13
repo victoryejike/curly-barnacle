@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { LucideTrash2 } from "lucide-react";
-import { state } from "@/state";
-// import { useSnapshot } from "valtio";
+// import { useNavigate } from "react-router-dom";
+// import { state } from "@/state";
 
 const CountdownTimer = ({
   waitTime,
@@ -11,57 +11,34 @@ const CountdownTimer = ({
   data,
 }: any) => {
   const localStorageKey = `countdownTimer_${identifier}`;
-  const [remainingTime, setRemainingTime] = useState(
-    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60
+  const [remainingTime, setRemainingTime] = useState(() => {
+    const storedTime = JSON.parse(localStorage.getItem(localStorageKey)!);
+    return storedTime !== null ? storedTime : waitTime * 60;
+  });
+  const [countdownFinished, setCountdownFinished] = useState(
+    remainingTime === 0
   );
-  const [countdownFinished, setCountdownFinished] = useState(false);
-  const isMounted = useRef(true);
-  //   const snap = useSnapshot(state);
+  // const navigate = useNavigate();
+  // const isMounted = useRef(true);
 
   useEffect(() => {
-    let timer: any;
-    const clearTimer = () => clearInterval(timer);
-
-    if (remainingTime > 0) {
-      timer = setInterval(() => {
-        setRemainingTime((prevTime: any) => {
-          const newTime = prevTime - 1;
-          localStorage.setItem(localStorageKey, JSON.stringify(newTime));
-          return newTime;
-        });
-      }, 1000);
-    } else if (!countdownFinished) {
-      setCountdownFinished(true);
-      onCountdownFinish(); // Call the callback function when countdown finishes
-      localStorage.removeItem(localStorageKey);
-      state.showDelete = true;
-    }
+    const timer = setInterval(() => {
+      setRemainingTime((prevTime: any) => {
+        if (prevTime === 0) {
+          setCountdownFinished(true);
+          onCountdownFinish();
+          localStorage.removeItem(localStorageKey);
+          clearInterval(timer); // Stop the interval when countdown finishes
+          return 0; // Ensure the remaining time is set to 0
+        }
+        return prevTime - 1; // Continue counting down
+      });
+    }, 1000);
 
     return () => {
-      if (timer) {
-        clearTimer();
-      }
+      clearInterval(timer);
     };
-  }, [
-    onCountdownFinish,
-    localStorageKey,
-    countdownFinished,
-    data,
-    remainingTime,
-  ]);
-
-  // Set the isMounted ref to false when the component unmounts
-  useEffect(() => {
-    return () => {
-      isMounted.current = false;
-    };
-  }, [
-    onCountdownFinish,
-    localStorageKey,
-    countdownFinished,
-    data,
-    remainingTime,
-  ]);
+  }, [onCountdownFinish, localStorageKey, remainingTime]);
 
   const formatTime = (seconds: any) => {
     const minutes = Math.floor(seconds / 60);
@@ -76,12 +53,10 @@ const CountdownTimer = ({
     const updatedOrders: any = data.filter((order: any) => order.id !== id);
 
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
-    window.location.reload();
+    // navigate(0);
   };
 
-  //   if (countdownFinished && snap.showDelete) {
-  //     setTimeout(() => window.location.reload(), 3000);
-  //   }
+  console.log(JSON.parse(localStorage.getItem("orders")!));
 
   return (
     <div>

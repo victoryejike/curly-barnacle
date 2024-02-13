@@ -2,7 +2,7 @@
 import Backoffice from "./pages/Backoffice";
 import Frontoffice from "./pages/Frontoffice";
 import Header from "./components/Header";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import Auth from "./pages/Auth";
 import Login from "./pages/Login";
 
@@ -26,19 +26,24 @@ import { useEffect, useState } from "react";
 
 function App() {
   // const [user] = useAuthState(auth);
-  const [currentUser, setCurrentUser] = useState<any>();
+  const [currentUser, setCurrentUser] = useState<any>(true);
 
   // const snap = useSnapshot(state);
+  const local =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setCurrentUser(user);
+      if (user || local) {
+        setCurrentUser(true);
       } else {
-        <Navigate to="/login" />;
+        setCurrentUser(false);
+        <Navigate to="/" />;
+        toast.error("Please log in to access this page");
       }
     });
-  }, []);
+  }, [local]);
 
   return (
     <section className="">

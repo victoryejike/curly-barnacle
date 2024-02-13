@@ -73,7 +73,7 @@ const Login = () => {
           `User not found. \n Please check that your details are correct`
         );
       } else {
-        toast.error("An error occurred, please try again");
+        toast.error("Email or password is incorrect");
       }
       setLoading(false);
     }
