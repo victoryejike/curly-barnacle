@@ -27,6 +27,9 @@ import { useEffect, useState } from "react";
 function App() {
   // const [user] = useAuthState(auth);
   const [currentUser, setCurrentUser] = useState<any>();
+  // const loggedInUser =
+  //   JSON.parse(localStorage.getItem("user")!) !== undefined &&
+  //   JSON.parse(localStorage.getItem("user")!);
 
   // const snap = useSnapshot(state);
 

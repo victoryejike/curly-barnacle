@@ -5,6 +5,7 @@ import Banner from "../assets/bukkahut-banner.png";
 import { Stepper } from "react-form-stepper";
 import { useSnapshot } from "valtio";
 import { state } from "@/state";
+import { Navigate } from "react-router-dom";
 
 // import { onAuthStateChanged } from "firebase/auth";
 
@@ -13,28 +14,36 @@ import { state } from "@/state";
 
 const Backoffice = () => {
   const { formStep } = useSnapshot(state);
+  const loggedInUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
 
   return (
     <section className="font-primary">
-      <>
-        <Stepper
-          className="text-orange-400 text-medium justify-start"
-          steps={[{ label: "Customer order" }, { label: "Order summary" }]}
-          activeStep={formStep}
-        />
+      {loggedInUser.role === "Cashier" ||
+      loggedInUser.role === "Order processor" ? (
+        <>
+          <Stepper
+            className="text-orange-400 text-medium justify-start"
+            steps={[{ label: "Customer order" }, { label: "Order summary" }]}
+            activeStep={formStep}
+          />
 
-        <div className="block lg:flex justify-start items-start py-8">
-          <div className="w-full mr-6 bg-white">
-            <img src={Banner} alt="bukkahut banner" />
-            <OrderForm />
-            {/* <OrderPreview /> */}
-            <OrderSummary />
-          </div>
-          {/* <div className="w-full lg:w-4/12">
+          <div className="block lg:flex justify-start items-start py-8">
+            <div className="w-full mr-6 bg-white">
+              <img src={Banner} alt="bukkahut banner" />
+              <OrderForm />
+              {/* <OrderPreview /> */}
+              <OrderSummary />
+            </div>
+            {/* <div className="w-full lg:w-4/12">
           <OrderSummary />
         </div> */}
-        </div>
-      </>
+          </div>
+        </>
+      ) : (
+        <Navigate to="/view" />
+      )}
     </section>
   );
 };

@@ -28,6 +28,9 @@ const Header = () => {
   const { pathname } = location;
   const [currentUser, setCurrentUser] = useState<any>();
   const navigate = useNavigate();
+  const loggedInUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -72,9 +75,12 @@ const Header = () => {
                   <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
                     <Link to="/view">View Orders</Link>
                   </DropdownMenuLabel>
-                  <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
-                    <Link to="/order">Create Order</Link>
-                  </DropdownMenuLabel>
+                  {loggedInUser.role === "Cashier" ||
+                    (loggedInUser.role === "Order processor" && (
+                      <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
+                        <Link to="/order">Create Order</Link>
+                      </DropdownMenuLabel>
+                    ))}
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel
                     onClick={handleSignout}
