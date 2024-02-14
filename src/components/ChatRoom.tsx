@@ -76,7 +76,7 @@ const ChatRoom = () => {
   return (
     <>
       {currentUser.role !== "Cashier" ? (
-        <Card className="my-5 ml-3 border border-orange-400">
+        <Card className="my-5 border border-orange-400">
           <CardHeader className="border-b mb-3 border-b-orange-400">
             <CardTitle>Bukka hut chat room</CardTitle>
             <CardDescription>Send messages to team members.</CardDescription>

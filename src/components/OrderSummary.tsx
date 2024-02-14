@@ -22,6 +22,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
 type CardProps = React.ComponentProps<typeof Card>;
 
@@ -29,17 +30,38 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
   const navigate = useNavigate();
   const db = getFirestore();
+  const [orders, setOrders] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
   const handleRefresh = () => {
     state.order = {};
     state.formStep = 0;
   };
 
+  useEffect(() => {
+    const getMessages = async () => {
+      const docRef = doc(db, "orders", currentUser.location);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && Array.isArray(data.updatedOrders)) {
+          setOrders(data.updatedOrders);
+        }
+      }
+    };
+    getMessages();
+  }, [currentUser.location, db, snap.showDelete]);
+
   const handleClick = async (e: any) => {
+    setLoading(true);
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem("user")!);
 
-    const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
-    const updatedOrders = [...storedOrders, state.order];
+    // const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
+    const updatedOrders = [...orders, state.order];
 
     const docRef = doc(db, "orders", user.location);
     const docSnap = await getDoc(docRef);
@@ -48,10 +70,12 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
 
     if (docSnap.exists()) {
       await setDoc(doc(db, "orders", user.location), { updatedOrders });
+      setLoading(false);
     } else {
       await setDoc(doc(db, "orders", user.location), {
         updatedOrders,
       });
+      setLoading(false);
     }
 
     await toast.success("Order created successfully", {
@@ -129,7 +153,7 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
           Refresh
         </Button>
         <Button className="w-full bg-orange-500" onClick={handleClick}>
-          <Check className="mr-2 h-4 w-4" /> Order
+          <Check className="mr-2 h-4 w-4" /> {loading ? "loading..." : "Order"}
         </Button>
       </CardFooter>
       <Toaster />

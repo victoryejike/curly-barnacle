@@ -35,7 +35,6 @@ const Frontoffice = () => {
     []
   );
   // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
-  console.log(orders);
 
   const handleCountdownFinish = useCallback(
     (id: string) => {
@@ -80,19 +79,19 @@ const Frontoffice = () => {
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data && Array.isArray(data.orders)) {
-          setOrders(data.messages);
+        if (data && Array.isArray(data.updatedOrders)) {
+          setOrders(data.updatedOrders);
         }
       }
     };
     getMessages();
   }, [currentUser.location, db, placedOrders, snap.showDelete]);
 
-  if (placedOrders && placedOrders.length < 1) {
+  if (orders && orders.length < 1) {
     return (
       <>
         <div className="flex flex-col-reverse justify-between">
-          <div className="h-screen flex justify-center items-center grow">
+          <div className="h-screen flex justify-center items-center grow border border-orange-400 rounded-lg">
             <div className="items-center flex flex-col justify-center">
               <img src={Logo} alt="logo" />
               <p className="pt-4">No order has been added yet.</p>
@@ -118,25 +117,26 @@ const Frontoffice = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {placedOrders.map((invoice: any) => (
-            <TableRow key={nanoid()}>
-              <TableCell className="font-medium">{invoice.id}</TableCell>
-              <TableCell>{invoice.customerInfo.customerName}</TableCell>
-              <TableCell>
-                {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
-              </TableCell>
-              <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
-              <TableCell>
-                <CountdownTimer
-                  waitTime={invoice.orderInfo.waitTime}
-                  onCountdownFinish={() => handleCountdownFinish(invoice.id)}
-                  identifier={invoice.id}
-                  data={placedOrders}
-                  key={invoice.id}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
+          {orders &&
+            orders.map((invoice: any) => (
+              <TableRow key={nanoid()}>
+                <TableCell className="font-medium">{invoice.id}</TableCell>
+                <TableCell>{invoice.customerInfo.customerName}</TableCell>
+                <TableCell>
+                  {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
+                </TableCell>
+                <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
+                <TableCell>
+                  <CountdownTimer
+                    waitTime={invoice.orderInfo.waitTime}
+                    onCountdownFinish={() => handleCountdownFinish(invoice.id)}
+                    identifier={invoice.id}
+                    data={placedOrders}
+                    key={invoice.id}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
       <div className="w-full">
