@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Check } from "lucide-react";
 
@@ -20,23 +21,48 @@ import {
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
 type CardProps = React.ComponentProps<typeof Card>;
 
 const OrderSummary = ({ className, ...props }: CardProps) => {
   const snap = useSnapshot(state);
   const navigate = useNavigate();
+  const db = getFirestore();
   const handleRefresh = () => {
     state.order = {};
     state.formStep = 0;
   };
 
-  const handleClick = async () => {
+  const handleClick = async (e: any) => {
+    e.preventDefault();
+    const user = JSON.parse(localStorage.getItem("user")!);
+
+    const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
+    const updatedOrders = [...storedOrders, state.order];
+
+    const docRef = doc(db, "orders", user.location);
+    const docSnap = await getDoc(docRef);
+
+    console.log(user, user.location, docSnap.exists());
+
+    if (docSnap.exists()) {
+      await setDoc(doc(db, "orders", user.location), { updatedOrders });
+    } else {
+      await setDoc(doc(db, "orders", user.location), {
+        updatedOrders,
+      });
+    }
+
     await toast.success("Order created successfully", {
       duration: 4000,
       position: "top-right",
     });
-    const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
-    const updatedOrders = [...storedOrders, state.order];
+
+    await toast.success("Order created successfully", {
+      duration: 4000,
+      position: "top-right",
+    });
 
     localStorage.setItem("orders", JSON.stringify(updatedOrders));
 

@@ -12,15 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState, useRef } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
-import {
-  getFirestore,
-  addDoc,
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  limit,
-} from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const ChatRoom = () => {
@@ -42,35 +34,44 @@ const ChatRoom = () => {
       toast.error("please enter a valid message");
       return;
     }
-    await addDoc(collection(db, "messages"), {
+
+    const textMessage = {
       text: message,
       name: currentUser.username,
       createdAt: new Date(),
       email: currentUser.email,
-    });
+    };
+
+    const updatedMessages = messages.push(textMessage);
+    setMessages(updatedMessages);
+
+    const docRef = doc(db, "messages", currentUser.location);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      await setDoc(doc(db, "messages", currentUser.location), { messages });
+    } else {
+      await setDoc(doc(db, "messages", currentUser.location), { messages });
+    }
+
     toast.success("message sent");
     setMessage("");
   };
 
   useEffect(() => {
-    const q = query(
-      collection(db, "messages"),
-      orderBy("createdAt", "desc"),
-      limit(50)
-    );
+    const getMessages = async () => {
+      const docRef = doc(db, "messages", currentUser.location);
+      const docSnap = await getDoc(docRef);
 
-    const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-      const fetchedMessages: any[] = [];
-      QuerySnapshot.forEach((doc) => {
-        fetchedMessages.push({ ...doc.data(), id: doc.id });
-      });
-      const sortedMessages: any[] = fetchedMessages.sort(
-        (a, b) => a.createdAt - b.createdAt
-      );
-      setMessages(sortedMessages);
-    });
-    return () => unsubscribe();
-  }, [db]);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && Array.isArray(data.messages)) {
+          setMessages(data.messages);
+        }
+      }
+    };
+    getMessages();
+  }, [currentUser.location, db, messages]);
 
   return (
     <>
@@ -81,32 +82,33 @@ const ChatRoom = () => {
             <CardDescription>Send messages to team members.</CardDescription>
           </CardHeader>
           <CardContent className="h-[250px] overflow-y-scroll">
-            {messages.map((message: any) => (
-              <div
-                className={`flex ${
-                  message.email === currentUser.email
-                    ? "justify-end text-right"
-                    : "justify-start  text-left"
-                } items-start grow`}
-                key={message.id}
-              >
-                <Avatar className="mr-2">
-                  <AvatarFallback>BH</AvatarFallback>
-                </Avatar>
-                <p
-                  className={`shadow-sm ${
+            {messages.length > 0 &&
+              messages.map((message: any) => (
+                <div
+                  className={`flex ${
                     message.email === currentUser.email
-                      ? "bg-orange-200 text-right"
-                      : "bg-gray-300 text-left"
-                  }  my-2 rounded-md p-2 text-[13px]`}
+                      ? "justify-end text-right"
+                      : "justify-start  text-left"
+                  } items-start grow`}
+                  key={message.createdAt.nanoseconds}
                 >
-                  <span className="block text-[10px] font-semibold">
-                    {message.name}
-                  </span>
-                  {message.text}
-                </p>
-              </div>
-            ))}
+                  <Avatar className="mr-2">
+                    <AvatarFallback>BH</AvatarFallback>
+                  </Avatar>
+                  <p
+                    className={`shadow-sm ${
+                      message.email === currentUser.email
+                        ? "bg-orange-200 text-right"
+                        : "bg-gray-300 text-left"
+                    }  my-2 rounded-md p-2 text-[13px]`}
+                  >
+                    <span className="block text-[10px] font-semibold">
+                      {message.name}
+                    </span>
+                    {message.text}
+                  </p>
+                </div>
+              ))}
           </CardContent>
           <span ref={scroll}></span>
           <CardFooter ref={scroll}>

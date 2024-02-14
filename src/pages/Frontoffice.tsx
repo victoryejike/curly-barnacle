@@ -14,20 +14,28 @@ import Logo from "../assets/bukkahut.svg";
 
 import { useSnapshot } from "valtio";
 import { state } from "@/state";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 import ChatRoom from "@/components/ChatRoom";
 
 const Frontoffice = () => {
   const snap = useSnapshot(state);
+  const db = getFirestore();
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
+
+  const [orders, setOrders] = useState<any>([]);
   // const [orders, setOrders] = useState<any>([]);
   const placedOrders = useMemo(
     () => JSON.parse(localStorage.getItem("orders")!) || [],
     []
   );
   // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
+  console.log(orders);
 
   const handleCountdownFinish = useCallback(
     (id: string) => {
@@ -65,7 +73,20 @@ const Frontoffice = () => {
       .join(", ");
   };
 
-  useEffect(() => {}, [placedOrders, snap.showDelete]);
+  useEffect(() => {
+    const getMessages = async () => {
+      const docRef = doc(db, "orders", currentUser.location);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data && Array.isArray(data.orders)) {
+          setOrders(data.messages);
+        }
+      }
+    };
+    getMessages();
+  }, [currentUser.location, db, placedOrders, snap.showDelete]);
 
   if (placedOrders && placedOrders.length < 1) {
     return (
