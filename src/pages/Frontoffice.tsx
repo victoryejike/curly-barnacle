@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CountdownTimer from "@/components/CountdownTimer";
-
+import { Toaster, toast } from "react-hot-toast";
 import Logo from "../assets/bukkahut.svg";
 
 // import { useSnapshot } from "valtio";
@@ -45,7 +45,10 @@ const Frontoffice = () => {
 
   const handleCountdownFinish = useCallback(async (id: string) => {
     console.log(id);
-    alert("working");
+    await toast.success(`Order with id ${id} is ready`, {
+      duration: 4000,
+      position: "top-right",
+    });
     // setCompletedCountdowns((prevCompletedCountdowns: any) => [
     //   ...prevCompletedCountdowns,
     //   id,
@@ -122,7 +125,7 @@ const Frontoffice = () => {
       }
     };
     getMessages();
-  }, [currentUser.location, db, orders]);
+  }, [currentUser.location, db]);
 
   if (orders && orders.length < 1) {
     return (
@@ -179,6 +182,7 @@ const Frontoffice = () => {
       <div className="w-full">
         <ChatRoom />
       </div>
+      <Toaster />
     </div>
   );
 };
