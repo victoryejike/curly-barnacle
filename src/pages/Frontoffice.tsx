@@ -12,17 +12,24 @@ import CountdownTimer from "@/components/CountdownTimer";
 
 import Logo from "../assets/bukkahut.svg";
 
-import { useSnapshot } from "valtio";
-import { state } from "@/state";
-import { useCallback, useEffect, useMemo, useState } from "react";
+// import { useSnapshot } from "valtio";
+// import { state } from "@/state";
+import { useCallback, useEffect, useState } from "react";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("1234567890abcdef", 10);
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  // query,
+  // collection,
+  // where,
+} from "firebase/firestore";
 
 import ChatRoom from "@/components/ChatRoom";
 
 const Frontoffice = () => {
-  const snap = useSnapshot(state);
+  // const snap = useSnapshot(state);
   const db = getFirestore();
   const currentUser =
     JSON.parse(localStorage.getItem("user")!) !== undefined &&
@@ -30,40 +37,49 @@ const Frontoffice = () => {
 
   const [orders, setOrders] = useState<any>([]);
   // const [orders, setOrders] = useState<any>([]);
-  const placedOrders = useMemo(
-    () => JSON.parse(localStorage.getItem("orders")!) || [],
-    []
-  );
+  // const placedOrders = useMemo(
+  //   () => JSON.parse(localStorage.getItem("orders")!) || [],
+  //   []
+  // );
   // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
 
-  const handleCountdownFinish = useCallback(
-    (id: string) => {
-      // setCompletedCountdowns((prevCompletedCountdowns: any) => [
-      //   ...prevCompletedCountdowns,
-      //   id,
-      // ]);
-      // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
-      // Update orderInfo with waitTime set to 0
-      // orders.filter((order: any) => order.id !== id);
-      // setCompletedCountdowns(updatedOrder);
-      const updatedOrders: any = placedOrders.map((order: any) => {
-        if (order.id === id) {
-          return {
-            ...order,
-            orderInfo: {
-              ...order.orderInfo,
-              waitTime: 0,
-            },
-          };
-        }
-        return order; // Return the unchanged order for other items
-      });
+  const handleCountdownFinish = useCallback(async (id: string) => {
+    console.log(id);
+    alert("working");
+    // setCompletedCountdowns((prevCompletedCountdowns: any) => [
+    //   ...prevCompletedCountdowns,
+    //   id,
+    // ]);
+    // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
+    // Update orderInfo with waitTime set to 0
+    // orders.filter((order: any) => order.id !== id);
+    // setCompletedCountdowns(updatedOrder);
+    // const updatedOrders: any = orders.map((order: any) => {
+    //   if (order.id === id) {
+    //     return {
+    //       ...order,
+    //       isExpired: true,
+    //     };
+    //   }
+    //   return order; // Return the unchanged order for other items
+    // });
 
-      localStorage.setItem("orders", JSON.stringify(updatedOrders));
-      // setOrders(updatedOrders);
-    },
-    [placedOrders]
-  );
+    // const docRef = doc(db, "orders", currentUser.location);
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   const data = docSnap.data();
+    //   if (data && Array.isArray(data.updatedOrders)) {
+    //     setOrders(
+    //       data.updatedOrders.filter(
+    //         (orderData: any) => orderData.isExpired === false
+    //       )
+    //     );
+    //   }
+    // }
+    // localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    // setOrders(updatedOrders);
+  }, []);
 
   const getOrder = (orderInfo: any) => {
     return Object.values(orderInfo)
@@ -74,18 +90,39 @@ const Frontoffice = () => {
 
   useEffect(() => {
     const getMessages = async () => {
+      // const ordersCollection = collection(db, "orders", currentUser.location);
+      // const expiredOrdersQuery = query(
+      //   ordersCollection,
+      //   where("isExpired", "==", false)
+      // );
+
+      // try {
+      //   const querySnapshot = await getDocs(expiredOrdersQuery);
+      //   const expiredOrders = querySnapshot.docs.map((doc: any) => doc.data());
+      //   setOrders(expiredOrders);
+      //   return expiredOrders;
+      // } catch (error) {
+      //   console.error("Error getting expired orders: ", error);
+      //   setOrders([]);
+      //   return [];
+      // }
+      // const q = query(collection(db, "orders", currentUser.location, where()));
       const docRef = doc(db, "orders", currentUser.location);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data && Array.isArray(data.updatedOrders)) {
-          setOrders(data.updatedOrders);
+          setOrders(
+            data.updatedOrders.filter(
+              (orderData: any) => orderData.isExpired === false
+            )
+          );
         }
       }
     };
     getMessages();
-  }, [currentUser.location, db, placedOrders, snap.showDelete]);
+  }, [currentUser.location, db, orders]);
 
   if (orders && orders.length < 1) {
     return (
@@ -131,7 +168,7 @@ const Frontoffice = () => {
                     waitTime={invoice.orderInfo.waitTime}
                     onCountdownFinish={() => handleCountdownFinish(invoice.id)}
                     identifier={invoice.id}
-                    data={placedOrders}
+                    data={orders}
                     key={invoice.id}
                   />
                 </TableCell>
