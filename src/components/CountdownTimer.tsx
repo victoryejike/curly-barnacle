@@ -2,6 +2,15 @@
 import { useState, useEffect, useRef } from "react";
 import { LucideTrash2 } from "lucide-react";
 import { state } from "@/state";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  // getDoc,
+  // query,
+  // collection,
+  // where,
+} from "firebase/firestore";
 // import { useSnapshot } from "valtio";
 
 const CountdownTimer = ({
@@ -10,6 +19,10 @@ const CountdownTimer = ({
   onCountdownFinish,
   data,
 }: any) => {
+  const db = getFirestore();
+  const currentUser =
+    JSON.parse(localStorage.getItem("user")!) !== undefined &&
+    JSON.parse(localStorage.getItem("user")!);
   const localStorageKey = `countdownTimer_${identifier}`;
   const [remainingTime, setRemainingTime] = useState(
     JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60
@@ -72,16 +85,41 @@ const CountdownTimer = ({
     ).padStart(2, "0")}`;
   };
 
-  const handleDelete = (id: string) => {
-    const updatedOrders: any = data.filter((order: any) => order.id !== id);
+  const handleDelete = async (id: string) => {
+    const updatedOrders: any = data.map((order: any) => {
+      if (order.id === id) {
+        return {
+          ...order,
+          isExpired: true,
+        };
+      }
+      return order; // Return the unchanged order for other items
+    });
 
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
-    window.location.reload();
+    await setDoc(doc(db, "orders", currentUser.location), {
+      updatedOrders,
+    });
+
+    console.log(updatedOrders);
+
+    // const docRef = doc(db, "orders", currentUser.location);
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   const data = docSnap.data();
+    //   if (data && Array.isArray(data.updatedOrders)) {
+    //     setOrders(
+    //       data.updatedOrders.filter(
+    //         (orderData: any) => orderData.isExpired === false
+    //       )
+    //     );
+    //   }
+    // }
+    // const updatedOrders: any = data.filter((order: any) => order.id !== id);
+
+    // localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    // window.location.reload();
   };
-
-  //   if (countdownFinished && snap.showDelete) {
-  //     setTimeout(() => window.location.reload(), 3000);
-  //   }
 
   return (
     <div>

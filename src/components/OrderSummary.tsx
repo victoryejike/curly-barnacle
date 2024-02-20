@@ -83,13 +83,6 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
       position: "top-right",
     });
 
-    await toast.success("Order created successfully", {
-      duration: 4000,
-      position: "top-right",
-    });
-
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
-
     console.log(updatedOrders);
     state.submitted = true;
     state.summary = [

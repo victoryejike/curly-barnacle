@@ -42,6 +42,7 @@ import { useNavigate } from "react-router-dom";
 // ***** proposed update to form schema
 const formSchema: any = z.object({
   id: z.string(),
+  isExpired: z.boolean(),
   customerInfo: z.object({
     customerName: z.string().min(1, "Required"),
     phone: z.string().min(1, "Required"),
@@ -124,6 +125,7 @@ const OrderForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: `#${nanoid(7)}`,
+      isExpired: false,
       customerInfo: {
         customerName: "",
         phone: "",
