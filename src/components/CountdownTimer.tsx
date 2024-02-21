@@ -6,7 +6,7 @@ import {
   getFirestore,
   doc,
   setDoc,
-  // getDoc,
+  getDoc,
   // query,
   // collection,
   // where,
@@ -18,6 +18,7 @@ const CountdownTimer = ({
   identifier,
   onCountdownFinish,
   data,
+  setData,
 }: any) => {
   const db = getFirestore();
   const currentUser =
@@ -25,7 +26,7 @@ const CountdownTimer = ({
     JSON.parse(localStorage.getItem("user")!);
   const localStorageKey = `countdownTimer_${identifier}`;
   const [remainingTime, setRemainingTime] = useState(
-    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60
+    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60,
   );
   const [countdownFinished, setCountdownFinished] = useState(false);
   const isMounted = useRef(true);
@@ -81,7 +82,7 @@ const CountdownTimer = ({
     const remainingSeconds = seconds % 60;
 
     return `${String(minutes).padStart(2, "0")}:${String(
-      remainingSeconds
+      remainingSeconds,
     ).padStart(2, "0")}`;
   };
 
@@ -100,7 +101,15 @@ const CountdownTimer = ({
       updatedOrders,
     });
 
-    console.log(updatedOrders);
+    const docRef = doc(db, "orders", currentUser.location);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data && Array.isArray(data.updatedOrders)) {
+        setData(data.updatedOrders);
+      }
+    }
 
     // const docRef = doc(db, "orders", currentUser.location);
     // const docSnap = await getDoc(docRef);

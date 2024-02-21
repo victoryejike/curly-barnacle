@@ -21,6 +21,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  setDoc,
   // query,
   // collection,
   // where,
@@ -43,46 +44,57 @@ const Frontoffice = () => {
   // );
   // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
 
-  const handleCountdownFinish = useCallback(async (id: string) => {
-    console.log(id);
-    await toast.success(`Order with id ${id} is ready`, {
-      duration: 4000,
-      position: "top-right",
-    });
-    // setCompletedCountdowns((prevCompletedCountdowns: any) => [
-    //   ...prevCompletedCountdowns,
-    //   id,
-    // ]);
-    // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
-    // Update orderInfo with waitTime set to 0
-    // orders.filter((order: any) => order.id !== id);
-    // setCompletedCountdowns(updatedOrder);
-    // const updatedOrders: any = orders.map((order: any) => {
-    //   if (order.id === id) {
-    //     return {
-    //       ...order,
-    //       isExpired: true,
-    //     };
-    //   }
-    //   return order; // Return the unchanged order for other items
-    // });
+  const handleCountdownFinish = useCallback(
+    async (id: string) => {
+      // console.log(id);
+      // await toast.success(`Order with id ${id} is ready`, {
+      //   duration: 4000,
+      //   position: "top-right",
+      // });
+      // setCompletedCountdowns((prevCompletedCountdowns: any) => [
+      //   ...prevCompletedCountdowns,
+      //   id,
+      // ]);
+      // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
+      // Update orderInfo with waitTime set to 0
+      // orders.filter((order: any) => order.id !== id);
+      // setCompletedCountdowns(updatedOrder);
+      const updatedOrders: any = orders.map((order: any) => {
+        if (order.id === id) {
+          return {
+            ...order,
+            orderInfo: {
+              ...order.orderInfo,
+              waitTime: 0,
+            },
+          };
+        }
+        return order; // Return the unchanged order for other items
+      });
 
-    // const docRef = doc(db, "orders", currentUser.location);
-    // const docSnap = await getDoc(docRef);
+      console.log(updatedOrders);
 
-    // if (docSnap.exists()) {
-    //   const data = docSnap.data();
-    //   if (data && Array.isArray(data.updatedOrders)) {
-    //     setOrders(
-    //       data.updatedOrders.filter(
-    //         (orderData: any) => orderData.isExpired === false
-    //       )
-    //     );
-    //   }
-    // }
-    // localStorage.setItem("orders", JSON.stringify(updatedOrders));
-    // setOrders(updatedOrders);
-  }, []);
+      // const docRef = doc(db, "orders", currentUser.location);
+      // const docSnap = await getDoc(docRef);
+      await setDoc(doc(db, "orders", currentUser.location), {
+        updatedOrders,
+      });
+
+      // if (docSnap.exists()) {
+      //   const data = docSnap.data();
+      //   if (data && Array.isArray(data.updatedOrders)) {
+      //     setOrders(
+      //       data.updatedOrders.filter(
+      //         (orderData: any) => orderData.isExpired === false
+      //       )
+      //     );
+      //   }
+      // }
+      // localStorage.setItem("orders", JSON.stringify(updatedOrders));
+      // setOrders(updatedOrders);
+    },
+    [orders, db, currentUser.location],
+  );
 
   const getOrder = (orderInfo: any) => {
     return Object.values(orderInfo)
@@ -116,18 +128,17 @@ const Frontoffice = () => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data && Array.isArray(data.updatedOrders)) {
-          setOrders(
-            data.updatedOrders.filter(
-              (orderData: any) => orderData.isExpired === false
-            )
-          );
+          setOrders(data.updatedOrders);
         }
       }
     };
     getMessages();
   }, [currentUser.location, db]);
 
-  if (orders && orders.length < 1) {
+  if (
+    orders &&
+    orders.filter((orderData: any) => orderData.isExpired === false).length < 1
+  ) {
     return (
       <>
         <div className="flex flex-col-reverse justify-between">
@@ -158,25 +169,30 @@ const Frontoffice = () => {
         </TableHeader>
         <TableBody>
           {orders &&
-            orders.map((invoice: any) => (
-              <TableRow key={nanoid()}>
-                <TableCell className="font-medium">{invoice.id}</TableCell>
-                <TableCell>{invoice.customerInfo.customerName}</TableCell>
-                <TableCell>
-                  {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
-                </TableCell>
-                <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
-                <TableCell>
-                  <CountdownTimer
-                    waitTime={invoice.orderInfo.waitTime}
-                    onCountdownFinish={() => handleCountdownFinish(invoice.id)}
-                    identifier={invoice.id}
-                    data={orders}
-                    key={invoice.id}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            orders
+              .filter((orderData: any) => orderData.isExpired === false)
+              .map((invoice: any) => (
+                <TableRow key={nanoid()}>
+                  <TableCell className="font-medium">{invoice.id}</TableCell>
+                  <TableCell>{invoice.customerInfo.customerName}</TableCell>
+                  <TableCell>
+                    {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
+                  </TableCell>
+                  <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
+                  <TableCell>
+                    <CountdownTimer
+                      waitTime={invoice.orderInfo.waitTime}
+                      onCountdownFinish={() =>
+                        handleCountdownFinish(invoice.id)
+                      }
+                      identifier={invoice.id}
+                      data={orders}
+                      setData={setOrders}
+                      key={invoice.id}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
         </TableBody>
       </Table>
       <div className="w-full">
