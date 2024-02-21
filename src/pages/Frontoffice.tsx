@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CountdownTimer from "@/components/CountdownTimer";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import Logo from "../assets/bukkahut.svg";
 
 // import { useSnapshot } from "valtio";
