@@ -2,16 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { LucideTrash2 } from "lucide-react";
 import { state } from "@/state";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  // query,
-  // collection,
-  // where,
-} from "firebase/firestore";
-// import { useSnapshot } from "valtio";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const CountdownTimer = ({
   waitTime,
@@ -26,7 +17,7 @@ const CountdownTimer = ({
     JSON.parse(localStorage.getItem("user")!);
   const localStorageKey = `countdownTimer_${identifier}`;
   const [remainingTime, setRemainingTime] = useState(
-    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60,
+    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60
   );
   const [countdownFinished, setCountdownFinished] = useState(false);
   const isMounted = useRef(true);
@@ -82,7 +73,7 @@ const CountdownTimer = ({
     const remainingSeconds = seconds % 60;
 
     return `${String(minutes).padStart(2, "0")}:${String(
-      remainingSeconds,
+      remainingSeconds
     ).padStart(2, "0")}`;
   };
 
@@ -110,24 +101,6 @@ const CountdownTimer = ({
         setData(data.updatedOrders);
       }
     }
-
-    // const docRef = doc(db, "orders", currentUser.location);
-    // const docSnap = await getDoc(docRef);
-
-    // if (docSnap.exists()) {
-    //   const data = docSnap.data();
-    //   if (data && Array.isArray(data.updatedOrders)) {
-    //     setOrders(
-    //       data.updatedOrders.filter(
-    //         (orderData: any) => orderData.isExpired === false
-    //       )
-    //     );
-    //   }
-    // }
-    // const updatedOrders: any = data.filter((order: any) => order.id !== id);
-
-    // localStorage.setItem("orders", JSON.stringify(updatedOrders));
-    // window.location.reload();
   };
 
   return (
@@ -135,10 +108,15 @@ const CountdownTimer = ({
       {countdownFinished ? (
         <div className="flex justify-start items-center">
           <p>Ready Now!</p>
-          <LucideTrash2
-            className="text-red-400 cursor-pointer ml-10"
-            onClick={() => handleDelete(identifier)}
-          />
+          {currentUser.role === "Cashier" ||
+          currentUser.role === "Order processor" ? (
+            <LucideTrash2
+              className="text-red-400 cursor-pointer ml-10"
+              onClick={() => handleDelete(identifier)}
+            />
+          ) : (
+            ""
+          )}
         </div>
       ) : (
         <p>Remaining Time {formatTime(remainingTime)}</p>

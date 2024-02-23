@@ -7,11 +7,6 @@ import { useSnapshot } from "valtio";
 import { state } from "@/state";
 import { Navigate } from "react-router-dom";
 
-// import { onAuthStateChanged } from "firebase/auth";
-
-// react imports
-// import { Navigate } from "react-router-dom";
-
 const Backoffice = () => {
   const { formStep } = useSnapshot(state);
   const loggedInUser =

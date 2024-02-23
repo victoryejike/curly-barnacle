@@ -37,28 +37,8 @@ const Frontoffice = () => {
     JSON.parse(localStorage.getItem("user")!);
 
   const [orders, setOrders] = useState<any>([]);
-  // const [orders, setOrders] = useState<any>([]);
-  // const placedOrders = useMemo(
-  //   () => JSON.parse(localStorage.getItem("orders")!) || [],
-  //   []
-  // );
-  // const [completedCountdowns, setCompletedCountdowns] = useState<any>([]);
-
   const handleCountdownFinish = useCallback(
     async (id: string) => {
-      // console.log(id);
-      // await toast.success(`Order with id ${id} is ready`, {
-      //   duration: 4000,
-      //   position: "top-right",
-      // });
-      // setCompletedCountdowns((prevCompletedCountdowns: any) => [
-      //   ...prevCompletedCountdowns,
-      //   id,
-      // ]);
-      // const orderObj = JSON.parse(localStorage.getItem("orders")!) || [];
-      // Update orderInfo with waitTime set to 0
-      // orders.filter((order: any) => order.id !== id);
-      // setCompletedCountdowns(updatedOrder);
       const updatedOrders: any = orders.map((order: any) => {
         if (order.id === id) {
           return {
@@ -72,28 +52,11 @@ const Frontoffice = () => {
         return order; // Return the unchanged order for other items
       });
 
-      console.log(updatedOrders);
-
-      // const docRef = doc(db, "orders", currentUser.location);
-      // const docSnap = await getDoc(docRef);
       await setDoc(doc(db, "orders", currentUser.location), {
         updatedOrders,
       });
-
-      // if (docSnap.exists()) {
-      //   const data = docSnap.data();
-      //   if (data && Array.isArray(data.updatedOrders)) {
-      //     setOrders(
-      //       data.updatedOrders.filter(
-      //         (orderData: any) => orderData.isExpired === false
-      //       )
-      //     );
-      //   }
-      // }
-      // localStorage.setItem("orders", JSON.stringify(updatedOrders));
-      // setOrders(updatedOrders);
     },
-    [orders, db, currentUser.location],
+    [orders, currentUser.location]
   );
 
   const getOrder = (orderInfo: any) => {
@@ -105,23 +68,6 @@ const Frontoffice = () => {
 
   useEffect(() => {
     const getMessages = async () => {
-      // const ordersCollection = collection(db, "orders", currentUser.location);
-      // const expiredOrdersQuery = query(
-      //   ordersCollection,
-      //   where("isExpired", "==", false)
-      // );
-
-      // try {
-      //   const querySnapshot = await getDocs(expiredOrdersQuery);
-      //   const expiredOrders = querySnapshot.docs.map((doc: any) => doc.data());
-      //   setOrders(expiredOrders);
-      //   return expiredOrders;
-      // } catch (error) {
-      //   console.error("Error getting expired orders: ", error);
-      //   setOrders([]);
-      //   return [];
-      // }
-      // const q = query(collection(db, "orders", currentUser.location, where()));
       const docRef = doc(db, "orders", currentUser.location);
       const docSnap = await getDoc(docRef);
 
