@@ -12,10 +12,18 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState, useRef } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+} from "firebase/firestore";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { customAlphabet } from "nanoid";
 
 const ChatRoom = () => {
+  const nanoid = customAlphabet("1234567890abcdef", 15);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<any>([]);
   const scroll = useRef<HTMLDivElement>(null);
@@ -40,18 +48,23 @@ const ChatRoom = () => {
       name: currentUser.username,
       createdAt: new Date(),
       email: currentUser.email,
+      messageId: `#M-${nanoid(7)}`,
     };
 
-    const updatedMessages = messages.push(textMessage);
+    const updatedMessages = [...messages, textMessage];
     setMessages(updatedMessages);
 
     const docRef = doc(db, "messages", currentUser.location);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      await setDoc(doc(db, "messages", currentUser.location), { messages });
+      await setDoc(doc(db, "messages", currentUser.location), {
+        messages: [...messages, textMessage],
+      });
     } else {
-      await setDoc(doc(db, "messages", currentUser.location), { messages });
+      await setDoc(doc(db, "messages", currentUser.location), {
+        messages: [...messages, textMessage],
+      });
     }
 
     toast.success("message sent");
@@ -59,19 +72,19 @@ const ChatRoom = () => {
   };
 
   useEffect(() => {
-    const getMessages = async () => {
-      const docRef = doc(db, "messages", currentUser.location);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+    const docRef = doc(db, "messages", currentUser.location);
+    const unsubscribe = onSnapshot(docRef, (doc: any) => {
+      if (doc.exists()) {
+        const data = doc.data();
         if (data && Array.isArray(data.messages)) {
           setMessages(data.messages);
         }
       }
-    };
-    getMessages();
-  }, [currentUser.location, db, messages]);
+    });
+
+    // Cleanup the listener when the component unmounts
+    return () => unsubscribe();
+  }, [currentUser.location, db]);
 
   return (
     <>
@@ -90,7 +103,7 @@ const ChatRoom = () => {
                       ? "justify-end text-right"
                       : "justify-start  text-left"
                   } items-start grow`}
-                  key={message.createdAt.nanoseconds}
+                  key={message.messageId}
                 >
                   <Avatar className="mr-2">
                     <AvatarFallback>BH</AvatarFallback>
