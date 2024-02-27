@@ -5,10 +5,11 @@ import Header from "./components/Header";
 import { Toaster } from "react-hot-toast";
 import Auth from "./pages/Auth";
 import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // state
 // import { useSnapshot } from "valtio";
-// import { state } from "@/state";
+import { state } from "@/state";
 
 // firebase
 import { auth } from "@/firebase";
@@ -26,22 +27,37 @@ import { useEffect, useState } from "react";
 
 function App() {
   // const [user] = useAuthState(auth);
-  const [currentUser, setCurrentUser] = useState<any>();
-  // const loggedInUser =
-  //   JSON.parse(localStorage.getItem("user")!) !== undefined &&
-  //   JSON.parse(localStorage.getItem("user")!);
-
-  // const snap = useSnapshot(state);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
+        state.user = user;
+        setIsFetching(false);
+
+        return;
       } else {
-        <Navigate to="/login" />;
+        setCurrentUser(null);
+        state.user = null;
+        setIsFetching(false);
       }
     });
+
+    return () => unsubscribe();
   }, []);
+
+  if (isFetching) {
+    return (
+      <section className="flex justify-center items-center h-screen">
+        <div
+          className="my-auto h-8 w-8 animate-spin text-orange-300 rounded-full border-4 border-solid border-current border-r-transparent  motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status"
+        ></div>
+      </section>
+    );
+  }
 
   return (
     <section className="">
@@ -54,11 +70,19 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route
                 path="/order"
-                element={currentUser ? <Backoffice /> : <Login />}
+                element={
+                  <ProtectedRoute user={currentUser}>
+                    <Backoffice></Backoffice>
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/view"
-                element={currentUser ? <Frontoffice /> : <Login />}
+                element={
+                  <ProtectedRoute user={currentUser}>
+                    <Frontoffice></Frontoffice>
+                  </ProtectedRoute>
+                }
               />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>

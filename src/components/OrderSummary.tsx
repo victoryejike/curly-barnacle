@@ -66,8 +66,6 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     const docRef = doc(db, "orders", user.location);
     const docSnap = await getDoc(docRef);
 
-    console.log(user, user.location, docSnap.exists());
-
     if (docSnap.exists()) {
       await setDoc(doc(db, "orders", user.location), { updatedOrders });
       setLoading(false);
@@ -83,7 +81,6 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
       position: "top-right",
     });
 
-    console.log(updatedOrders);
     state.submitted = true;
     state.summary = [
       {

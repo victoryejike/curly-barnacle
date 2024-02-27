@@ -67,7 +67,6 @@ const Login = () => {
       navigate("/order");
       setLoading(false);
     } catch (error: any) {
-      console.log(error.code);
       if (error.code === "auth/user-not-found") {
         toast.error(
           `User not found. \n Please check that your details are correct`
