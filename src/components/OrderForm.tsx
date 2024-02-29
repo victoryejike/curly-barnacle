@@ -100,18 +100,63 @@ const formSchema: any = z.object({
     ),
 });
 
-const languages = [
-  { label: "Jollof Rice", value: "en", price: 1200 },
-  { label: "Nigerian Fried Rice", value: "fr", price: 1600 },
-  { label: "Meat Pie", value: "de", price: 1300 },
-  { label: "Egusi Soup", value: "es", price: 1200 },
-  { label: "Spinach Stew (Efo Riro)", value: "pt", price: 2200 },
-  { label: "Beef Stew", value: "ru", price: 1000 },
-  { label: "African Buns – Nigerian Buns", value: "ja", price: 1900 },
-  { label: "Plantain Puff Puff", value: "ko", price: 3200 },
-  { label: "Spicy Puff Puff Recipe", value: "zh", price: 1200 },
-  { label: "Chicken Stew", value: "we", price: 1200 },
-] as const;
+const breakfastMenu = [
+  { label: "Boiled yam", value: "en", price: 400 },
+  { label: "Pap", value: "en", price: 400 },
+  { label: "Custard", value: "en", price: 400 },
+  { label: "Akara", value: "en", price: 600 },
+  { label: "Fish sauce", value: "en", price: 1100 },
+  { label: "Egg sauce", value: "en", price: 1000 },
+  { label: "Boiled plantain", value: "en", price: 400 },
+];
+const mainMenu = [
+  { label: "Village rice", value: "en", price: 1600 },
+  { label: "Rich palm oil", value: "en", price: 2200 },
+  { label: "Special fried rice", value: "en", price: 2000 },
+  { label: "Jambalaya rice", value: "en", price: 2200 },
+  { label: "Coconut rice", value: "en", price: 1100 },
+  { label: "Jollof rice", value: "en", price: 1000 },
+  { label: "Fried rice", value: "en", price: 1000 },
+  { label: "Rice and Beans", value: "en", price: 800 },
+  { label: "Ewariro", value: "en", price: 900 },
+  { label: "Plain beans", value: "en", price: 900 },
+  { label: "Yam porridge", value: "en", price: 1200 },
+  { label: "Spaghetti", value: "en", price: 1000 },
+  { label: "White rice", value: "en", price: 800 },
+];
+const protein = [
+  { label: "Cowleg", value: "en", price: 2200 },
+  { label: "Cowtail", value: "en", price: 2200 },
+  { label: "Goat meat", value: "en", price: 2000 },
+  { label: "Assorted", value: "en", price: 900 },
+  { label: "Beef", value: "en", price: 900 },
+  { label: "Ponmo", value: "en", price: 500 },
+  { label: "Fried turkey", value: "en", price: 2100 },
+  { label: "Grilled chicken", value: "en", price: 2500 },
+  { label: "Small turkey", value: "en", price: 2500 },
+  { label: "Asun", value: "en", price: 2000 },
+  { label: "Panla", value: "en", price: 2100 },
+  { label: "Titus", value: "en", price: 1700 },
+  { label: "Cat fish", value: "en", price: 2700 },
+  { label: "Croaker", value: "en", price: 2200 },
+];
+const additionalItems = [
+  { label: "Coleslaw", value: "en", price: 400 },
+  { label: "Plantain", value: "en", price: 600 },
+  { label: "Moi Moi", value: "en", price: 800 },
+];
+const drinks = [
+  { label: "Pepsi", value: "en", price: 500 },
+  { label: "Coca-cola", value: "en", price: 500 },
+  { label: "utterly yum", value: "en", price: 2400 },
+  { label: "Fura", value: "en", price: 3200 },
+  { label: "tiger nut ", value: "en", price: 2800 },
+  { label: "boomsky", value: "en", price: 2850 },
+  { label: "Lucozade boost", value: "en", price: 1000 },
+  { label: "Ribena", value: "en", price: 900 },
+  { label: "Malt", value: "en", price: 600 },
+  { label: "Water", value: "en", price: 350 },
+];
 
 const OrderForm = () => {
   const snap = useSnapshot(state);
@@ -284,7 +329,7 @@ const OrderForm = () => {
                         <CommandInput placeholder="Search breakfast menu..." />
                         <CommandEmpty>No item found.</CommandEmpty>
                         <CommandGroup>
-                          {languages.map((language) => (
+                          {breakfastMenu.map((language) => (
                             <CommandItem
                               value={language.label}
                               key={language.value}
@@ -353,7 +398,7 @@ const OrderForm = () => {
                         <CommandInput placeholder="Search main menu..." />
                         <CommandEmpty>No item found.</CommandEmpty>
                         <CommandGroup>
-                          {languages.map((language) => (
+                          {mainMenu.map((language) => (
                             <CommandItem
                               value={language.label}
                               key={language.value}
@@ -421,7 +466,7 @@ const OrderForm = () => {
                         <CommandInput placeholder="Search protein..." />
                         <CommandEmpty>No item found.</CommandEmpty>
                         <CommandGroup>
-                          {languages.map((language) => (
+                          {protein.map((language) => (
                             <CommandItem
                               value={language.label}
                               key={language.value}
@@ -487,7 +532,7 @@ const OrderForm = () => {
                         <CommandInput placeholder="Search Drinks..." />
                         <CommandEmpty>No item found.</CommandEmpty>
                         <CommandGroup>
-                          {languages.map((language) => (
+                          {drinks.map((language) => (
                             <CommandItem
                               value={language.label}
                               key={language.value}
@@ -555,7 +600,7 @@ const OrderForm = () => {
                         <CommandInput placeholder="Search Additonal Items..." />
                         <CommandEmpty>No item found.</CommandEmpty>
                         <CommandGroup>
-                          {languages.map((language) => (
+                          {additionalItems.map((language) => (
                             <CommandItem
                               value={language.label}
                               key={language.value}

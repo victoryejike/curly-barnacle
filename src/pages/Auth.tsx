@@ -73,6 +73,23 @@ const Auth = () => {
     "Kitchen Supervisor",
     "Order processor",
   ];
+  const locations = [
+    "Lekki",
+    "Gate view",
+    "Blenco",
+    "Circle mall",
+    "Ikota",
+    "Cheveron",
+    "MMA",
+    "Surulere",
+    "Gbagada",
+    "Osolo",
+    "Festac",
+    "Ikorodu",
+    "Ikoyi",
+    "Ikoyi plaza",
+    "Ogudu",
+  ];
   const [type, setType] = useState<string | any>("password");
   const [confirmType, setConfirmType] = useState<string | any>("password");
   const form = useForm<z.infer<typeof formSchema>>({
@@ -204,9 +221,23 @@ const Auth = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Outlet Location</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Location" type="text" {...field} />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your outlet location" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {locations.map((location) => (
+                          <SelectItem key={location} value={location}>
+                            {location}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

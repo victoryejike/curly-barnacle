@@ -75,12 +75,12 @@ const Header = () => {
                   <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
                     <Link to="/view">View Orders</Link>
                   </DropdownMenuLabel>
-                  {loggedInUser.role === "Cashier" ||
-                    (loggedInUser.role === "Order processor" && (
-                      <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
-                        <Link to="/order">Create Order</Link>
-                      </DropdownMenuLabel>
-                    ))}
+                  {(loggedInUser.role === "Cashier" ||
+                    loggedInUser.role === "Order processor") && (
+                    <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
+                      <Link to="/order">Create Order</Link>
+                    </DropdownMenuLabel>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel
                     onClick={handleSignout}
