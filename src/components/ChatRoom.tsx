@@ -50,7 +50,7 @@ const ChatRoom = () => {
       email: currentUser.email,
       messageId: `#M-${nanoid(7)}`,
     };
-
+    setMessage("");
     const updatedMessages = [...messages, textMessage];
     setMessages(updatedMessages);
 
@@ -68,7 +68,6 @@ const ChatRoom = () => {
     }
 
     toast.success("message sent");
-    setMessage("");
   };
 
   useEffect(() => {

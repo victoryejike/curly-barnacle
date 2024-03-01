@@ -80,7 +80,7 @@ const Auth = () => {
     "Circle mall",
     "Ikota",
     "Cheveron",
-    "MMA",
+    "MMA 2",
     "Surulere",
     "Gbagada",
     "Osolo",
