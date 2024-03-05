@@ -20,8 +20,9 @@ const nanoid = customAlphabet("1234567890abcdef", 10);
 import {
   getFirestore,
   doc,
-  getDoc,
+  // getDoc,
   setDoc,
+  onSnapshot,
   // query,
   // collection,
   // where,
@@ -67,18 +68,18 @@ const Frontoffice = () => {
   };
 
   useEffect(() => {
-    const getMessages = async () => {
-      const docRef = doc(db, "orders", currentUser.location);
-      const docSnap = await getDoc(docRef);
+    const ordersCollectionRef = doc(db, "orders", currentUser.location);
 
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+    const unsubscribe = onSnapshot(ordersCollectionRef, (doc) => {
+      if (doc.exists()) {
+        const data = doc.data();
         if (data && Array.isArray(data.updatedOrders)) {
           setOrders(data.updatedOrders);
         }
       }
-    };
-    getMessages();
+    });
+
+    return () => unsubscribe();
   }, [currentUser.location, db]);
 
   if (

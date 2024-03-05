@@ -108,6 +108,9 @@ const breakfastMenu = [
   { label: "Fish sauce", value: "en", price: 1100 },
   { label: "Egg sauce", value: "en", price: 1000 },
   { label: "Boiled plantain", value: "en", price: 400 },
+  { label: "Pap and akara", value: "en", price: 1000 },
+  { label: "Custard and akara", value: "en", price: 1000 },
+  { label: "Yam and egg sauce", value: "en", price: 1400 },
 ];
 const mainMenu = [
   { label: "Village rice", value: "en", price: 1600 },
