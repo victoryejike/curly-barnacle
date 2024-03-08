@@ -10,19 +10,33 @@ const CountdownTimer = ({
   onCountdownFinish,
   data,
   setData,
+  currentTime,
 }: any) => {
   const db = getFirestore();
   const currentUser =
     JSON.parse(localStorage.getItem("user")!) !== undefined &&
     JSON.parse(localStorage.getItem("user")!);
   const localStorageKey = `countdownTimer_${identifier}`;
-  const [remainingTime, setRemainingTime] = useState(
-    JSON.parse(localStorage.getItem(localStorageKey)!) || waitTime * 60
-  );
   const [countdownFinished, setCountdownFinished] = useState(false);
   const isMounted = useRef(true);
   //   const snap = useSnapshot(state);
 
+  const handleTimeConversion = (time: any, currTime: any) => {
+    const futureTimestamp: any = time;
+    const currentTimestamp: any = currTime;
+    const remainingDbTime: number = futureTimestamp - currentTimestamp;
+
+    if (!isNaN(remainingDbTime) && remainingDbTime >= 0) {
+      const remainingTimeInMinutes = Math.floor(remainingDbTime / 1000);
+      return remainingTimeInMinutes;
+    } else {
+      return 0;
+    }
+  };
+
+  const [remainingTime, setRemainingTime] = useState<any>(
+    handleTimeConversion(waitTime, currentTime)
+  );
   useEffect(() => {
     let timer: any;
     const clearTimer = () => clearInterval(timer);
@@ -31,13 +45,12 @@ const CountdownTimer = ({
       timer = setInterval(() => {
         setRemainingTime((prevTime: any) => {
           const newTime = prevTime - 1;
-          localStorage.setItem(localStorageKey, JSON.stringify(newTime));
           return newTime;
         });
       }, 1000);
     } else if (!countdownFinished) {
       setCountdownFinished(true);
-      onCountdownFinish(); // Call the callback function when countdown finishes
+      // onCountdownFinish(); // Call the callback function when countdown finishes
       localStorage.removeItem(localStorageKey);
       state.showDelete = true;
     }
@@ -57,6 +70,8 @@ const CountdownTimer = ({
 
   // Set the isMounted ref to false when the component unmounts
   useEffect(() => {
+    // const newWaitTIme = handleTimeConversion(waitTime) * 60;
+    // setRemainingTime(newWaitTIme);
     return () => {
       isMounted.current = false;
     };
@@ -66,6 +81,7 @@ const CountdownTimer = ({
     countdownFinished,
     data,
     remainingTime,
+    waitTime,
   ]);
 
   const formatTime = (seconds: any) => {

@@ -35,6 +35,7 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
   const currentUser =
     JSON.parse(localStorage.getItem("user")!) !== undefined &&
     JSON.parse(localStorage.getItem("user")!);
+
   const handleRefresh = () => {
     state.order = {};
     state.formStep = 0;
@@ -59,6 +60,16 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     setLoading(true);
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem("user")!);
+
+    const timeStampedOrder: any = { ...state.order };
+    const currentTimestamp = new Date().getTime(); // Current timestamp in milliseconds
+    const waitTimeInMinutes = timeStampedOrder.orderInfo.waitTime;
+    const futureTimestamp = currentTimestamp + waitTimeInMinutes * 60 * 1000;
+
+    // Convert future timestamp to a Date object
+    const futureDate = futureTimestamp;
+
+    state.order.orderInfo.waitTime = futureDate;
 
     // const storedOrders = JSON.parse(localStorage.getItem("orders")!) || [];
     const updatedOrders = [...orders, state.order];
@@ -108,6 +119,8 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
 
     navigate("/view");
   };
+
+  console.log(orders, state.order);
   return (
     <Card
       className={cn(

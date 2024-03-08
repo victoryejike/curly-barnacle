@@ -23,6 +23,7 @@ import {
   // getDoc,
   setDoc,
   onSnapshot,
+  Timestamp,
   // query,
   // collection,
   // where,
@@ -73,6 +74,7 @@ const Frontoffice = () => {
     const unsubscribe = onSnapshot(ordersCollectionRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
+        Timestamp;
         if (data && Array.isArray(data.updatedOrders)) {
           setOrders(data.updatedOrders);
         }
