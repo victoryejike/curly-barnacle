@@ -10,7 +10,6 @@ const CountdownTimer = ({
   onCountdownFinish,
   data,
   setData,
-  currentTime,
 }: any) => {
   const db = getFirestore();
   const currentUser =
@@ -21,9 +20,9 @@ const CountdownTimer = ({
   const isMounted = useRef(true);
   //   const snap = useSnapshot(state);
 
-  const handleTimeConversion = (time: any, currTime: any) => {
+  const handleTimeConversion = (time: any) => {
     const futureTimestamp: any = time;
-    const currentTimestamp: any = currTime;
+    const currentTimestamp: any = new Date().getTime();
     const remainingDbTime: number = futureTimestamp - currentTimestamp;
 
     if (!isNaN(remainingDbTime) && remainingDbTime >= 0) {
@@ -35,7 +34,7 @@ const CountdownTimer = ({
   };
 
   const [remainingTime, setRemainingTime] = useState<any>(
-    handleTimeConversion(waitTime, currentTime)
+    handleTimeConversion(waitTime)
   );
   useEffect(() => {
     let timer: any;
