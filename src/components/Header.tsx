@@ -76,7 +76,8 @@ const Header = () => {
                     <Link to="/view">View Orders</Link>
                   </DropdownMenuLabel>
                   {(loggedInUser.role === "Cashier" ||
-                    loggedInUser.role === "Order processor") && (
+                    loggedInUser.role === "Order processor" ||
+                    loggedInUser.role === "Audit Assistant") && (
                     <DropdownMenuLabel className="cursor-pointer font-medium hover:bg-slate-200 hover:rounded">
                       <Link to="/order">Create Order</Link>
                     </DropdownMenuLabel>

@@ -16,7 +16,8 @@ const Backoffice = () => {
   return (
     <section className="font-primary">
       {loggedInUser.role === "Cashier" ||
-      loggedInUser.role === "Order processor" ? (
+      loggedInUser.role === "Order processor" ||
+      loggedInUser.role === "Audit Assistant" ? (
         <>
           <Stepper
             className="text-orange-400 text-medium justify-start"
