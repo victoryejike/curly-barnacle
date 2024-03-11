@@ -34,7 +34,7 @@ const CountdownTimer = ({
   };
 
   const [remainingTime, setRemainingTime] = useState<any>(
-    handleTimeConversion(waitTime)
+    handleTimeConversion(waitTime),
   );
   useEffect(() => {
     let timer: any;
@@ -88,7 +88,7 @@ const CountdownTimer = ({
     const remainingSeconds = seconds % 60;
 
     return `${String(minutes).padStart(2, "0")}:${String(
-      remainingSeconds
+      remainingSeconds,
     ).padStart(2, "0")}`;
   };
 
@@ -124,7 +124,8 @@ const CountdownTimer = ({
         <div className="flex justify-start items-center">
           <p>Ready Now!</p>
           {currentUser.role === "Cashier" ||
-          currentUser.role === "Order processor" ? (
+          currentUser.role === "Order processor" ||
+          currentUser.role === "Audit Assistant" ? (
             <LucideTrash2
               className="text-red-400 cursor-pointer ml-10"
               onClick={() => handleDelete(identifier)}
