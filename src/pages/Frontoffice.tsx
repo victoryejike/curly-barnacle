@@ -11,6 +11,7 @@ import {
 import CountdownTimer from "@/components/CountdownTimer";
 import { Toaster } from "react-hot-toast";
 import Logo from "../assets/bukkahut.svg";
+import notification from "@/assets/audio/mixkit-happy-bells-notification-937.wav";
 
 // import { useSnapshot } from "valtio";
 // import { state } from "@/state";
@@ -58,7 +59,7 @@ const Frontoffice = () => {
         updatedOrders,
       });
     },
-    [orders, currentUser.location],
+    [orders, currentUser.location]
   );
 
   const getOrder = (orderInfo: any) => {
@@ -70,19 +71,23 @@ const Frontoffice = () => {
 
   useEffect(() => {
     const ordersCollectionRef = doc(db, "orders", currentUser.location);
+    const orderNotif = new Audio(notification);
 
     const unsubscribe = onSnapshot(ordersCollectionRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         Timestamp;
         if (data && Array.isArray(data.updatedOrders)) {
+          if (data.updatedOrders.length > orders.length) {
+            orderNotif.play();
+          }
           setOrders(data.updatedOrders);
         }
       }
     });
 
     return () => unsubscribe();
-  }, [currentUser.location, db]);
+  }, [currentUser.location, db, orders.length]);
 
   if (
     orders &&
@@ -111,6 +116,7 @@ const Frontoffice = () => {
           <TableRow>
             <TableHead className="w-[100px]">Order ID</TableHead>
             <TableHead>Customer Name</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="">Order</TableHead>
             <TableHead className="">Ready in</TableHead>
           </TableRow>
@@ -123,6 +129,9 @@ const Frontoffice = () => {
                 <TableRow key={nanoid()}>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>{invoice.customerInfo.customerName}</TableCell>
+                  <TableCell>
+                    {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
+                  </TableCell>
                   <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
                   <TableCell>
                     <CountdownTimer

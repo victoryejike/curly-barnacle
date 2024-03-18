@@ -275,7 +275,7 @@ const OrderForm = () => {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-0 overflow-y-scroll">
                       <Command>
                         <CommandInput placeholder="Search breakfast menu..." />
                         <CommandEmpty>No item found.</CommandEmpty>
@@ -344,7 +344,7 @@ const OrderForm = () => {
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="p-0 overflow-y-scroll overflow-scroll">
                       <Command>
                         <CommandInput placeholder="Search main menu..." />
                         <CommandEmpty>No item found.</CommandEmpty>

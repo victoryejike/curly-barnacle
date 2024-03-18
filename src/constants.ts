@@ -31,14 +31,6 @@ export const mainMenu = [
   { label: "Spaghetti", value: "sph-1100", price: 1100 },
   { label: "Macaroni Special", value: "macsp-1900", price: 1900 },
   { label: "White rice", value: "wre-850", price: 850 },
-  { label: "Meat pie", value: "mpe-650", price: 650 },
-  { label: "Chicken pie", value: "cpe-650", price: 650 },
-  { label: "Scotch egg", value: "sceg-550", price: 550 },
-  { label: "Doughnut", value: "doug-450", price: 450 },
-  { label: "Hot dog", value: "hod-450", price: 450 },
-  { label: "Sausage roll", value: "sar-500", price: 500 },
-  { label: "Hot Chops", value: "hcp-1450", price: 1450 },
-  { label: "Popcorn", value: "popc-1100", price: 1100 },
 ];
 export const protein = [
   { label: "Cowleg", value: "cowleg-2500", price: 2500 },
@@ -79,7 +71,14 @@ export const additionalItems = [
   { label: "Ofada sauce", value: "ofas-1750", price: 1750 },
   { label: "Gbegiri", value: "gbegs-300", price: 300 },
   { label: "Sea food Okro", value: "sefo-2700", price: 2700 },
-
+  { label: "Scotch egg", value: "sceg-550", price: 550 },
+  { label: "Doughnut", value: "doug-450", price: 450 },
+  { label: "Hot dog", value: "hod-450", price: 450 },
+  { label: "Sausage roll", value: "sar-500", price: 500 },
+  { label: "Hot Chops", value: "hcp-1450", price: 1450 },
+  { label: "Meat pie", value: "mpe-650", price: 650 },
+  { label: "Chicken pie", value: "cpe-650", price: 650 },
+  { label: "Popcorn", value: "popc-1100", price: 1100 },
   { label: "Moi Moi (small)", value: "moi-550", price: 550 },
 ];
 export const drinks = [

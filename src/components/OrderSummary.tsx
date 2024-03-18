@@ -60,6 +60,7 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     setLoading(true);
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem("user")!);
+    // const orderNotif = new Audio(notification);
 
     const timeStampedOrder: any = { ...state.order };
     const currentTimestamp = new Date().getTime(); // Current timestamp in milliseconds
@@ -80,11 +81,13 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     if (docSnap.exists()) {
       await setDoc(doc(db, "orders", user.location), { updatedOrders });
       setLoading(false);
+      // orderNotif.play();
     } else {
       await setDoc(doc(db, "orders", user.location), {
         updatedOrders,
       });
       setLoading(false);
+      // orderNotif.play();
     }
 
     await toast.success("Order created successfully", {
