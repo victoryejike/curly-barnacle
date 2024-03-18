@@ -89,6 +89,7 @@ const Auth = () => {
     "Ikoyi",
     "Ikoyi plaza",
     "Ogudu",
+    "Yaba",
   ];
   const [type, setType] = useState<string | any>("password");
   const [confirmType, setConfirmType] = useState<string | any>("password");
