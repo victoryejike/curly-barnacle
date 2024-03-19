@@ -71,7 +71,6 @@ const Frontoffice = () => {
 
   useEffect(() => {
     const ordersCollectionRef = doc(db, "orders", currentUser.location);
-    const orderNotif = new Audio(notification);
 
     const unsubscribe = onSnapshot(ordersCollectionRef, (doc) => {
       if (doc.exists()) {
@@ -79,7 +78,7 @@ const Frontoffice = () => {
         Timestamp;
         if (data && Array.isArray(data.updatedOrders)) {
           if (data.updatedOrders.length > orders.length) {
-            orderNotif.play();
+            console.log("yes");
           }
           setOrders(data.updatedOrders);
         }
@@ -146,6 +145,12 @@ const Frontoffice = () => {
               ))}
         </TableBody>
       </Table>
+      <div>
+        <audio controls loop autoPlay>
+          <source src={notification} type="audio/ogg" />
+          <source src={notification} type="audio/mpeg" />
+        </audio>
+      </div>
       <div className="w-full">
         <ChatRoom />
       </div>
