@@ -116,7 +116,6 @@ const Frontoffice = () => {
           <TableRow>
             <TableHead className="w-[100px]">Order ID</TableHead>
             <TableHead>Customer Name</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead className="">Order</TableHead>
             <TableHead className="">Ready in</TableHead>
           </TableRow>
@@ -129,9 +128,7 @@ const Frontoffice = () => {
                 <TableRow key={nanoid()}>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>{invoice.customerInfo.customerName}</TableCell>
-                  <TableCell>
-                    {invoice.orderInfo.waitTime !== 0 ? "In progress" : "Ready"}
-                  </TableCell>
+
                   <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
                   <TableCell>
                     <CountdownTimer
