@@ -78,7 +78,8 @@ const Frontoffice = () => {
         const data = doc.data();
         Timestamp;
         if (data && Array.isArray(data.updatedOrders)) {
-          if (data.updatedOrders.length > orders.length) {
+          const newCount = JSON.parse(localStorage.getItem("orderCount")!);
+          if (data.updatedOrders.length > newCount) {
             orderNotif.play();
           }
           setOrders(data.updatedOrders);

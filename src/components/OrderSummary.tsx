@@ -50,6 +50,10 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
         const data = docSnap.data();
         if (data && Array.isArray(data.updatedOrders)) {
           setOrders(data.updatedOrders);
+          localStorage.setItem(
+            "orderCount",
+            JSON.stringify(data.updatedOrders.length)
+          );
         }
       }
     };
