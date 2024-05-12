@@ -39,6 +39,7 @@ export type Role = {
 
 const formSchema: any = z
   .object({
+    createdAt: z.date(),
     username: z.string().min(1, "Required"),
     email: z.string().min(1, "Required"),
     password: z
@@ -102,6 +103,7 @@ const Auth = () => {
       role: "",
       location: "",
       confirmPassword: "",
+      createdAt: new Date(),
     },
   });
 
