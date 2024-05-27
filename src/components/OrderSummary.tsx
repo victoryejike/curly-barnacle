@@ -127,7 +127,6 @@ const OrderSummary = ({ className, ...props }: CardProps) => {
     navigate("/view");
   };
 
-  console.log(orders, state.order);
   return (
     <Card
       className={cn(

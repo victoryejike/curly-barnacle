@@ -53,6 +53,8 @@ const formSchema: any = z.object({
   id: z.string(),
   createdAt: z.date(),
   isExpired: z.boolean(),
+  orderNumber: z.coerce.number().gte(1, "Must be greater than 0"),
+  attendant: z.string(),
   customerInfo: z.object({
     customerName: z.string().min(1, "Required"),
     phone: z.string().min(1, "Required"),
@@ -123,6 +125,8 @@ const OrderForm = () => {
     defaultValues: {
       id: `#${nanoid(7)}`,
       createdAt: new Date(),
+      orderNumber: 1,
+      attendant: `${JSON.parse(localStorage.getItem("user")!).email}`,
       isExpired: false,
       customerInfo: {
         customerName: "",
@@ -180,7 +184,7 @@ const OrderForm = () => {
           values.orderInfo!.protein!.price! +
           values.orderInfo!.additionalItems!.price! +
           values.orderInfo!.drinks!.price!;
-        setSubtotal(calculatedTotal);
+        setSubtotal(calculatedTotal * values.orderNumber);
       }
     });
     // form.setValue("total", calculatedTotal);
@@ -205,13 +209,17 @@ const OrderForm = () => {
         }
 
         if (index === 2) {
-          data.description = values.orderInfo.waitTime + "mins";
+          data.description = values.orderNumber;
         }
 
         if (index === 3) {
+          data.description = values.orderInfo.waitTime + "mins";
+        }
+
+        if (index === 4) {
           data.description = subtotal;
         }
-        if (index === 4) {
+        if (index === 5) {
           data.description = subtotal;
         }
       });
@@ -613,6 +621,27 @@ const OrderForm = () => {
                 </FormItem>
               )}
             />
+          </div>
+          <div className="block lg:flex justify-between items-center w-full pb-3">
+            <FormField
+              control={form.control}
+              name="orderNumber"
+              render={({ field }) => (
+                <FormItem className="w-full lg:w-1/2 lg:mr-6">
+                  <FormLabel>Number of orders</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="enter order amount"
+                      type="number"
+                      {...field}
+                    />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="w-1/2"></div>
           </div>
           <Button
             className="w-full mt-3 lg:mt-4 py-6 lg:mx-auto text-base lg:text-lg bg-orange-400"

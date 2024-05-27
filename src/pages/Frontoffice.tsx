@@ -119,6 +119,7 @@ const Frontoffice = () => {
           <TableRow>
             <TableHead className="w-[100px]">Order ID</TableHead>
             <TableHead>Customer Name</TableHead>
+            <TableHead>Number of Orders</TableHead>
             <TableHead className="">Order</TableHead>
             <TableHead className="">Ready in</TableHead>
           </TableRow>
@@ -131,7 +132,7 @@ const Frontoffice = () => {
                 <TableRow key={nanoid()}>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>{invoice.customerInfo.customerName}</TableCell>
-
+                  <TableCell>{invoice.orderNumber || 1}</TableCell>
                   <TableCell>{getOrder(invoice.orderInfo)}</TableCell>
                   <TableCell>
                     <CountdownTimer

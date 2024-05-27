@@ -11,6 +11,10 @@ export const summaryInitialValues = [
     description: "-",
   },
   {
+    title: "Number of Orders",
+    description: "1",
+  },
+  {
     title: "Wait time",
     description: "-",
   },
