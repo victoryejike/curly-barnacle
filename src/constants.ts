@@ -13,6 +13,8 @@ export const breakfastMenu = [
   { label: "Sweet Potatoes (Fried)", value: "spf-800", price: 800 },
   { label: "Omelette Toast Bread", value: "otb-700", price: 700 },
   { label: "Milk", value: "milk-400", price: 400 },
+  { label: "Pap", value: "pap-400", price: 400 },
+  { label: "Pap and milk", value: "pap-milk-800", price: 800 },
 ];
 export const mainMenu = [
   { label: "Village rice", value: "vr-1700", price: 1700 },
